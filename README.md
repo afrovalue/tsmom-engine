@@ -90,7 +90,7 @@ python run.py --mode yahoo --vol-target 0.20   # gentler sizing
 python tests/test_engine.py            # validate the math on synthetic series
 python tests/audit.py                  # audit the real cache (look-ahead, splices, config)
 ```
-
+you must run python run.py --mode yahoo first. tests/audit.py needs the cache, and the cache won't be in the repo.
 CSV mode expects one file per ticker in `data_cache/`, columns `Date,Close` (extra columns fine; Stooq exports work as-is). Naming: `=` → `_`, leading `^` → `IDX_` (e.g. `CL=F` → `CL_F.csv`, `^GDAXI` → `IDX_GDAXI.csv`). A `--mode yahoo` run refreshes this cache automatically, so the engine keeps working offline afterwards.
 
 ## The two interactive tools
@@ -207,3 +207,4 @@ the engine cannot drift:
 python3 analytics/build_deck_data.py --engine . --out reports/deck_data.json
 node analytics/build_deck.js          # run it beside a copy of deck_data.json
 ```
+this is research code, not investment advice, and that the data comes from Yahoo Finance
