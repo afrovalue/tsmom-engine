@@ -1,0 +1,9 @@
+.DS_Store
+__MACOSX/
+__pycache__/
+*.pyc
+*.webloc
+*.pdf
+data_cache/*
+!data_cache/.gitkeep
+reports/cron.log

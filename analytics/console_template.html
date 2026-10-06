@@ -1,0 +1,537 @@
+<title>TSMOM Engine</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@600&display=swap">
+<style>
+:root{
+  --paper:#f6f7f9; --surface:#fcfdfe; --raised:#f1f3f6; --ink:#10151b; --ink2:#4d565f; --muted:#8a929b;
+  --grid:#e5e8ec; --baseline:#c6ccd2; --border:rgba(16,21,27,.10);
+  --long:#2a78d6; --short:#e34948; --accent:#2a78d6;
+  --long-wash:rgba(42,120,214,.10); --short-wash:rgba(227,73,72,.10);
+  --warn:#fab219; --warn-ink:#7a5200; --chip:#eceff2;
+  --eq:#2a78d6; --bd:#1baf7a; --cm:#eb6834; --fx:#4a3aa7; --cr:#e87ba4;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1114; --surface:#161a1f; --raised:#1d2228; --ink:#f2f4f6; --ink2:#b8bec6; --muted:#858c94;
+    --grid:#262b31; --baseline:#3a4048; --border:rgba(255,255,255,.10);
+    --long:#3987e5; --short:#e66767; --accent:#3987e5;
+    --long-wash:rgba(57,135,229,.14); --short-wash:rgba(230,103,103,.14);
+    --warn:#fab219; --warn-ink:#fab219; --chip:#20252b;
+    --eq:#3987e5; --bd:#199e70; --cm:#d95926; --fx:#9085e9; --cr:#d55181;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1114; --surface:#161a1f; --raised:#1d2228; --ink:#f2f4f6; --ink2:#b8bec6; --muted:#858c94;
+  --grid:#262b31; --baseline:#3a4048; --border:rgba(255,255,255,.10);
+  --long:#3987e5; --short:#e66767; --accent:#3987e5;
+  --long-wash:rgba(57,135,229,.14); --short-wash:rgba(230,103,103,.14);
+  --warn:#fab219; --warn-ink:#fab219; --chip:#20252b;
+  --eq:#3987e5; --bd:#199e70; --cm:#d95926; --fx:#9085e9; --cr:#d55181;
+}
+*{box-sizing:border-box}
+body{background:var(--paper); color:var(--ink); margin:0;
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; font-size:14.5px; line-height:1.5;}
+.wrap{max-width:1140px; margin:0 auto; padding:34px 22px 56px;}
+.eyebrow{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 6px;}
+h1{font-family:"IBM Plex Serif",Georgia,serif; font-weight:600; font-size:30px; margin:0 0 4px; text-wrap:balance;}
+.sub{color:var(--ink2); margin:0 0 18px; max-width:70ch;}
+.sub .mono{font-family:"IBM Plex Mono",monospace; font-size:13px;}
+
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px 18px; margin:0 0 14px;}
+.ctlrow{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin:0 0 15px;}
+.ctl-label{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--muted);}
+.seg{display:flex; background:var(--chip); border-radius:9px; padding:3px; gap:2px;}
+.seg button{border:0; background:transparent; color:var(--ink2); font:inherit; font-size:13px;
+  font-weight:500; padding:5px 13px; border-radius:7px; cursor:pointer;}
+.seg button:hover{color:var(--ink);}
+.seg button[aria-pressed="true"]{background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.10);}
+button:focus-visible, input:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+.sliders{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:20px;}
+.sl label{display:block; font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:5px;}
+.sl .v{font-family:"IBM Plex Mono",monospace; font-size:19px; font-weight:600; color:var(--ink);}
+.sl .d{font-size:12px; color:var(--muted); min-height:16px;}
+input[type=range]{width:100%; accent-color:var(--accent); margin:5px 0 2px;}
+input[type=number]{font:inherit; font-family:"IBM Plex Mono",monospace; font-size:19px; font-weight:600;
+  width:100%; max-width:175px; padding:2px 7px; border:1px solid var(--border); border-radius:7px;
+  background:var(--raised); color:var(--ink); font-variant-numeric:tabular-nums;}
+.presets{display:flex; gap:5px; margin:7px 0 10px; flex-wrap:wrap;}
+.presets button, .reset{border:1px solid var(--border); background:var(--raised); color:var(--ink2);
+  font:inherit; font-size:12px; padding:3.5px 10px; border-radius:6px; cursor:pointer;}
+.presets button:hover, .reset:hover{color:var(--ink); border-color:var(--baseline);}
+/* must out-specify `.sl label`, which would otherwise uppercase this control's text */
+.sl label.toggle, .toggle{display:flex; align-items:center; gap:9px; cursor:pointer;
+  user-select:none; font-size:13px; margin:2px 0 0; text-transform:none; letter-spacing:0;
+  font-family:"IBM Plex Sans",sans-serif; color:var(--ink2);}
+.toggle input{position:absolute; opacity:0; pointer-events:none;}
+.track{width:36px; height:20px; border-radius:10px; background:var(--baseline); position:relative; flex:0 0 auto;}
+.track::after{content:""; position:absolute; top:2.5px; left:2.5px; width:15px; height:15px; border-radius:50%;
+  background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.toggle input:checked + .track{background:var(--accent);}
+.toggle input:checked + .track::after{left:18.5px;}
+.toggle input:focus-visible + .track{outline:2px solid var(--accent); outline-offset:2px;}
+@media (prefers-reduced-motion: no-preference){ .track,.track::after{transition:.14s ease;} .seg button{transition:.12s;} }
+.mod{color:var(--warn-ink); font-family:"IBM Plex Mono",monospace; font-size:11.5px;}
+
+.riskgrid{display:grid; grid-template-columns:minmax(190px,auto) 1fr; gap:28px; align-items:center;}
+@media (max-width:780px){ .riskgrid{grid-template-columns:1fr; gap:16px} }
+.hero .lab{font-size:12px; color:var(--muted);}
+.hero .val{font-size:44px; font-weight:600; letter-spacing:-.02em; line-height:1.05; margin:2px 0;}
+.hero .note{font-size:12.5px; color:var(--ink2);}
+.volbar{position:relative; height:34px;}
+.volbar .track2{position:absolute; left:0; right:0; top:11px; height:12px; border-radius:6px;
+  background:var(--raised); border:1px solid var(--border);}
+.volbar .fill{position:absolute; left:0; top:11px; height:12px; border-radius:6px; background:var(--accent);}
+.volbar .cap{position:absolute; top:-4px; font-family:"IBM Plex Mono",monospace; font-size:11px;
+  color:var(--muted); white-space:nowrap;}
+.volbar .capb{position:absolute; bottom:-6px; font-family:"IBM Plex Mono",monospace; font-size:11px;
+  color:var(--ink2); white-space:nowrap;}
+.rl{display:flex; gap:20px; flex-wrap:wrap; margin-top:15px; font-size:12.5px;}
+.rl div{color:var(--muted);} .rl b{display:block; color:var(--ink); font-size:17px; font-weight:600; margin-top:1px;}
+
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(146px,1fr)); gap:10px; margin:0 0 14px;}
+.tile{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px;}
+.tile .lab{font-size:12px; color:var(--muted); margin-bottom:2px;}
+.tile .val{font-size:21px; font-weight:600; letter-spacing:-.01em;}
+.tile .note{font-size:12px; color:var(--ink2); font-family:"IBM Plex Mono",monospace; margin-top:2px;}
+.tile.flag{border-color:var(--warn);} .tile.flag .lab{color:var(--warn-ink);}
+
+.card-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+.card-head h2{font-size:14px; font-weight:600; margin:0;}
+.desc{font-size:12.5px; color:var(--muted); margin:1px 0 0;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media (max-width:840px){ .grid2{grid-template-columns:1fr} }
+.sl-row{display:grid; grid-template-columns:92px 1fr 122px; gap:12px; align-items:center; padding:7px 0;}
+.sl-row + .sl-row{border-top:1px solid var(--grid);}
+.sl-name{font-size:13px; font-weight:600; display:flex; align-items:center; gap:7px;}
+.dot{width:9px; height:9px; border-radius:50%; display:inline-block; flex:0 0 auto;}
+.sl-meta{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted); text-align:right;}
+.bar{position:relative; height:16px;}
+.bar .zero{position:absolute; left:50%; top:-2px; bottom:-2px; width:1px; background:var(--baseline);}
+.bar .fill{position:absolute; top:2px; bottom:2px; border-radius:0 4px 4px 0;}
+.bar .fill.neg{border-radius:4px 0 0 4px;}
+.bar .lb{position:absolute; top:50%; transform:translateY(-50%); font-family:"IBM Plex Mono",monospace;
+  font-size:11px; color:var(--ink2); white-space:nowrap;}
+.rbar{position:relative; height:15px; background:var(--raised); border-radius:4px; overflow:hidden;}
+.rbar .f{position:absolute; left:0; top:0; bottom:0; border-radius:4px;}
+
+.tblwrap{overflow-x:auto;}
+table{border-collapse:collapse; width:100%; font-size:13px; min-width:1000px;}
+th{font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:500;
+  text-align:right; padding:7px 9px; border-bottom:1px solid var(--baseline); white-space:nowrap;}
+th:first-child, th.l{text-align:left;}
+th.sortable{cursor:pointer; user-select:none;} th.sortable:hover{color:var(--ink);}
+th[aria-sort]{color:var(--ink);}
+th.grp{border-bottom:0; padding-bottom:0; font-size:10px; letter-spacing:.12em; color:var(--muted); opacity:.8;}
+td{padding:6px 9px; text-align:right; font-family:"IBM Plex Mono",monospace;
+  font-variant-numeric:tabular-nums; border-bottom:1px solid var(--grid); white-space:nowrap;}
+td.l{text-align:left; font-family:"IBM Plex Sans",sans-serif;}
+td.sep{border-left:1px solid var(--grid);}
+tr.flat td{opacity:.55;}
+tr.zero td.order{color:var(--warn-ink); font-weight:500;}
+.pill{display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600;
+  padding:1.5px 7px; border-radius:5px;}
+.pill.L{background:var(--long-wash); color:var(--long);}
+.pill.S{background:var(--short-wash); color:var(--short);}
+.pill.F{background:var(--chip); color:var(--muted);}
+.mini{font-family:"IBM Plex Mono",monospace; font-size:11px;}
+.mini.L{color:var(--long);} .mini.S{color:var(--short);} .mini.N{color:var(--muted);}
+.ag{display:inline-block; width:32px; height:6px; border-radius:3px; background:var(--grid); position:relative;}
+.ag i{position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--accent);}
+.nm{color:var(--ink);} .ex{color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:11px; margin-left:6px;}
+.weak{color:var(--warn-ink);}
+.copybtn{border:1px solid var(--border); background:var(--raised); color:var(--ink2); font:inherit;
+  font-size:12.5px; padding:5px 12px; border-radius:7px; cursor:pointer;}
+.copybtn:hover{color:var(--ink); border-color:var(--baseline);}
+.foot{color:var(--muted); font-size:12.5px; max-width:82ch; margin-top:20px;}
+.foot .mono{font-family:"IBM Plex Mono",monospace;}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">TSMOM · Signals → weights → orders</p>
+  <h1>TSMOM Engine</h1>
+  <p class="sub">One set of controls drives everything: the signal horizon and sizing rules
+    produce the weights, the weights produce the ex-ante risk, and the same weights produce the
+    orders. Move any control and all three update together.
+    <span class="mono" id="asof"></span></p>
+
+  <div class="panel">
+    <div class="ctlrow">
+      <span class="ctl-label">Signal</span>
+      <div class="seg" id="segH">
+        <button data-h="3">3m</button><button data-h="6">6m</button>
+        <button data-h="12" aria-pressed="true">12m</button>
+      </div>
+      <button class="reset" id="resetPaper">Paper (uncapped)</button><button class="reset" id="resetEng">Engine default (5×)</button>
+      <span class="mod" id="modNote"></span>
+    </div>
+    <div class="sliders">
+      <div class="sl">
+        <label for="vtR">Vol target per instrument</label>
+        <span class="v" id="vtV">40%</span>
+        <input type="range" id="vtR" min="5" max="60" step="1" value="40">
+        <div class="d">MOP Eq. 5 uses 40%.</div>
+      </div>
+      <div class="sl">
+        <label for="capR">Leverage cap</label>
+        <span class="v" id="capV">5.0×</span>
+        <input type="range" id="capR" min="1" max="31" step="0.5" value="5">
+        <div class="d" id="capD">Paper is uncapped.</div>
+      </div>
+      <div class="sl">
+        <label for="dbR">Deadband</label>
+        <span class="v" id="dbV">off</span>
+        <input type="range" id="dbR" min="0" max="200" step="5" value="0">
+        <div class="d" id="dbD">Weak trends go flat.</div>
+      </div>
+      <div class="sl">
+        <label for="navInput">Portfolio size (NAV)</label>
+        <input type="number" id="navInput" min="10000" step="10000" value="10000000">
+        <div class="presets" id="navPresets"></div>
+        <label class="toggle"><input type="checkbox" id="microChk">
+          <span class="track"></span><span>Micro contracts</span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="riskgrid">
+      <div class="hero">
+        <div class="lab">Ex-ante portfolio volatility</div>
+        <div class="val" id="volVal">—</div>
+        <div class="note" id="volNote"></div>
+      </div>
+      <div>
+        <div class="volbar" id="volBar"></div>
+        <div class="rl">
+          <div>Max possible vol<b id="maxVol">—</b></div>
+          <div>Diversification<b id="divR">—</b></div>
+          <div>At the cap<b id="nCap">—</b></div>
+          <div>Flat (deadband)<b id="nFlat">—</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="card-head"><div><h2>Positioning by sleeve</h2>
+        <p class="desc">Net weight as a share of NAV.</p></div></div>
+      <div id="sleeveNet"></div>
+    </div>
+    <div class="panel">
+      <div class="card-head"><div><h2>Risk by sleeve</h2>
+        <p class="desc">Share of ex-ante vol, then vol points contributed.</p></div></div>
+      <div id="sleeveRisk"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="card-head"><div><h2>Largest risk contributors</h2>
+      <p class="desc" id="topDesc"></p></div></div>
+    <div id="topRisk"></div>
+  </div>
+
+  <div class="panel">
+    <div class="card-head">
+      <div><h2>Signals, risk and orders</h2><p class="desc" id="tblDesc"></p></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="seg" id="segF">
+          <button data-f="all" aria-pressed="true">All</button>
+          <button data-f="Equity">Eq</button><button data-f="Bond">Bond</button>
+          <button data-f="Commodity">Cmdty</button><button data-f="FX">FX</button><button data-f="Crypto">Crypto</button>
+          <button data-f="weak">⚠ Weak</button>
+        </div>
+        <button class="copybtn" id="copyBtn">Copy orders</button>
+      </div>
+    </div>
+    <div class="tblwrap"><table id="tbl">
+      <thead>
+        <tr><th class="grp l" colspan="7">Signal</th><th class="grp sep" colspan="4">Risk</th>
+            <th class="grp sep" colspan="3">Execution</th></tr>
+        <tr>
+          <th class="l sortable" data-k="n">Instrument</th>
+          <th class="l">Dir</th><th>3m</th><th>6m</th><th>Agree</th>
+          <th class="sortable" data-k="tr">Trailing</th>
+          <th class="sortable" data-k="z">Strength</th>
+          <th class="sep sortable" data-k="v">Vol</th>
+          <th class="sortable" data-k="lv">Unit wt</th>
+          <th class="sortable" data-k="w">Port wt</th>
+          <th class="sortable" data-k="ctr">Risk</th>
+          <th class="l sep">Execute</th>
+          <th class="sortable" data-k="target">Target $</th>
+          <th>Gap $</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table></div>
+  </div>
+
+  <p class="foot"><b>Unit wt</b> is the per-instrument position <span class="mono">sign × min(vol target ÷ σ, cap)</span> — what the sizing rule asks for on its own, marked <span class="mono">ᶜ</span> where the cap binds. <b>Port wt</b> divides that by the number of live markets, which is what you actually hold. Weights are <span class="mono">sign × min(vol target ÷ σ, cap) ÷ N</span> with σ
+    the engine's EWMA vol (MOP Eq. 1). Ex-ante vol is <span class="mono">√(w'Σw)</span> using a
+    correlation matrix over the last <span class="mono" id="cw">750</span> trading days, shrunk
+    <span class="mono" id="sh">20%</span> toward the average pairwise correlation; <b>max possible
+    vol</b> is <span class="mono">Σ|wᵢ|σᵢ</span>, the ceiling if everything moved together. Risk
+    shares sum to 100%. <b>Strength</b> is the trailing return divided by the standard deviation of that
+    same k-month move, <span class="mono">z = r · (σ√(k/12))⁻¹</span> — a raw percentage is the
+    wrong unit, since a 2-year note down 1% at 1.2% vol has moved most of a standard deviation
+    while natural gas down 1% at 42% vol has not moved at all. The <span class="weak">⚠</span>
+    marks <span class="mono">|z| &lt; 0.5</span>: the sign is close to a coin flip, so those
+    positions are the likeliest to flip next month. The deadband, when on, is measured in the
+    same units and takes those markets flat. Prices are the last close in the engine's cache, so fills are indicative. Signals and
+    sizing output, not investment advice.</p>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+/*__CORE__*/
+
+const AC = {Equity:"var(--eq)", Bond:"var(--bd)", Commodity:"var(--cm)",
+            FX:"var(--fx)", Crypto:"var(--cr)"};
+const DEF = DATA.defaults;
+const PAPER = DATA.paper || {vol_target:0.40, cap:null, deadband:0};
+const WEAK = 0.5;   // trend strength below half a standard deviation of its own k-month move
+let S = {h:"12", f:"all", sort:"ctr", dir:-1,
+         vt:DEF.vol_target, cap:DEF.cap, db:0, nav:DEF.nav, micro:false};
+const P = () => ({vt:S.vt, cap:S.cap, db:S.db});
+
+const pct=(x,d=1)=>(100*x).toFixed(d)+"%";
+const pctS=(x,d=1)=>(x>=0?"+":"−")+Math.abs(100*x).toFixed(d)+"%";
+const fx2=x=>(x>=0?"+":"−")+Math.abs(x).toFixed(2)+"×";
+const fx3=x=>(x>=0?"+":"−")+Math.abs(x).toFixed(3)+"×";
+const money=x=>(x<0?"−":"+")+"$"+Math.abs(Math.round(x)).toLocaleString();
+const compact=x=>{const a=Math.abs(x);
+  return a>=1e9?(x/1e9).toFixed(2)+"B":a>=1e6?(x/1e6).toFixed(2)+"M":a>=1e3?Math.round(x/1e3)+"K":Math.round(x).toString();};
+
+/* one computation feeds signals, risk and execution */
+function build(){
+  const R = TS.risk(+S.h, P());
+  const sl = TS.sleeves(R.rows, R.ctr, R.sigma_p);
+  const rows = R.rows.map(r=>{
+    const d = TS.D.inst[r.i];
+    const target = r.w * S.nav;
+    const useMicro = S.micro && d.mu;
+    const unit = d.k==="unpriced" ? null : (useMicro ? d.mu : d.u);
+    const label = useMicro ? d.m : d.x;
+    let qty=null, filled=null, gap=null;
+    if(d.k==="fx"){ qty=target; filled=target; gap=0; }
+    else if(unit){ qty=Math.round(target/unit); filled=qty*unit; gap=filled-target; }
+    return {...r, d, target, unit, label, qty, filled, gap,
+            isFx:d.k==="fx", isEtf:d.k==="etf",
+            ctrv: R.ctr.has(r.i) ? R.ctr.get(r.i) : null,
+            ctr_pct: (R.ctr.has(r.i) && R.sigma_p>0) ? R.ctr.get(r.i)/R.sigma_p : null,
+            weak: Math.abs(r.z) < WEAK,
+            zero: d.k!=="fx" && unit && qty===0 && Math.abs(target)>0 && r.s!==0};
+  });
+  return {R, sl, rows};
+}
+
+function renderRisk(B){
+  const {R} = B;
+  document.getElementById("volVal").textContent = pct(R.sigma_p);
+  document.getElementById("volNote").textContent =
+    `annualized · ${R.n} live markets · ${Math.round(S.vt*100)}% target per instrument`;
+  document.getElementById("maxVol").textContent = pct(R.max_vol);
+  document.getElementById("divR").textContent = R.div ? R.div.toFixed(2)+"×" : "—";
+  document.getElementById("nCap").textContent = `${R.capped} / ${R.n}`;
+  document.getElementById("nFlat").textContent = B.rows.filter(r=>r.s===0).length;
+  const frac = R.max_vol>0 ? R.sigma_p/R.max_vol : 0;
+  document.getElementById("volBar").innerHTML =
+    `<span class="track2"></span><span class="fill" style="width:${(frac*100).toFixed(1)}%"></span>
+     <span class="capb" style="left:0">0%</span>
+     <span class="cap" style="left:calc(${(frac*100).toFixed(1)}% + 6px)">σₚ ${pct(R.sigma_p)}</span>
+     <span class="capb" style="right:0">max ${pct(R.max_vol)}</span>`;
+}
+
+function renderTiles(B){
+  const {R, rows} = B;
+  const priced = rows.filter(r=>r.filled!=null && r.s!==0);
+  const tgtG = rows.reduce((a,r)=>a+Math.abs(r.target),0);
+  const filG = priced.reduce((a,r)=>a+Math.abs(r.filled),0);
+  const zeros = rows.filter(r=>r.zero).length;
+  const weak = rows.filter(r=>r.weak && r.s!==0).length;
+  const weakGross = rows.filter(r=>r.weak && r.s!==0).reduce((a,r)=>a+Math.abs(r.w),0);
+  const t=[
+    {lab:"Net exposure", val:fx2(R.net), note:"of NAV"},
+    {lab:"Gross exposure", val:R.gross.toFixed(2)+"×", note:"of NAV"},
+    {lab:"Long / short", val:`${rows.filter(r=>r.s>0).length} / ${rows.filter(r=>r.s<0).length}`, note:"markets"},
+    {lab:"Weak signals", val:String(weak),
+     note: R.gross>0 ? pct(weakGross/R.gross,0)+" of gross" : "", flag: weak>0},
+    {lab:"Target notional", val:"$"+compact(tgtG), note:fx2(tgtG/S.nav).replace("+","")+" of NAV"},
+    {lab:"Zero-fills", val:String(zeros), note: zeros?"under ½ contract":"all fillable", flag: zeros>0},
+  ];
+  document.getElementById("tiles").innerHTML = t.map(x=>
+    `<div class="tile${x.flag?" flag":""}"><div class="lab">${x.lab}</div>
+     <div class="val">${x.val}</div><div class="note">${x.note}</div></div>`).join("");
+}
+
+function renderSleeves(B){
+  const {sl} = B;
+  const maxNet = Math.max(0.05, ...TS.ACS.map(a=>Math.abs(sl[a].net)));
+  document.getElementById("sleeveNet").innerHTML = TS.ACS.map(a=>{
+    const d=sl[a], w=Math.max(0.8, Math.abs(d.net)/maxNet/2*100), neg=d.net<0;
+    return `<div class="sl-row">
+      <span class="sl-name"><i class="dot" style="background:${AC[a]}"></i>${a}</span>
+      <div class="bar"><span class="zero"></span>
+        <span class="fill${neg?" neg":""}" style="${neg?"right:50%":"left:50%"};width:${w}%;background:${AC[a]}"></span>
+        <span class="lb" style="${neg?`right:${50+w}%;padding-right:6px`:`left:${50+w}%;padding-left:6px`}">${fx2(d.net)}</span></div>
+      <span class="sl-meta">${d.long}L / ${d.short}S${d.flat?" / "+d.flat+"F":""}</span></div>`;
+  }).join("");
+  const maxR = Math.max(0.01, ...TS.ACS.map(a=>Math.abs(sl[a].ctr_pct)));
+  document.getElementById("sleeveRisk").innerHTML = TS.ACS.map(a=>{
+    const d=sl[a];
+    return `<div class="sl-row">
+      <span class="sl-name"><i class="dot" style="background:${AC[a]}"></i>${a}</span>
+      <div class="rbar"><span class="f" style="width:${Math.max(0.6,Math.abs(d.ctr_pct)/maxR*100)}%;background:${AC[a]}"></span></div>
+      <span class="sl-meta">${pct(d.ctr_pct,0)} · ${pct(d.ctr,1)}</span></div>`;
+  }).join("");
+}
+
+function renderTop(B){
+  const top=[...B.rows].filter(r=>r.ctr_pct!=null && r.s!==0)
+    .sort((a,b)=>Math.abs(b.ctr_pct)-Math.abs(a.ctr_pct)).slice(0,12);
+  if(!top.length){ document.getElementById("topRisk").innerHTML=
+    `<p class="desc">Every position is flat at this deadband.</p>`;
+    document.getElementById("topDesc").textContent=""; return; }
+  const mx=Math.max(...top.map(i=>Math.abs(i.ctr_pct)),0.001);
+  document.getElementById("topDesc").innerHTML =
+    `Top ${top.length} of ${B.R.n_risk} markets in the risk model — together ` +
+    pct(top.reduce((s,i)=>s+i.ctr_pct,0),0) + " of portfolio volatility." +
+    (top.some(i=>i.weak) ? ` <span class="weak">⚠ ${top.filter(i=>i.weak).length} on a weak signal.</span>` : "");
+  document.getElementById("topRisk").innerHTML = top.map(i=>
+    `<div class="sl-row" style="grid-template-columns:190px 1fr 150px">
+      <span class="sl-name" style="font-weight:500">${i.d.n}${i.weak?' <span class="weak">⚠</span>':""}</span>
+      <div class="rbar"><span class="f" style="width:${Math.max(0.6,Math.abs(i.ctr_pct)/mx*100)}%;background:${i.s>0?"var(--long)":"var(--short)"}"></span></div>
+      <span class="sl-meta">${pct(i.ctr_pct,1)} · ${i.s>0?"L":"S"} ${fx3(i.w)}</span></div>`).join("");
+}
+
+function renderTable(B){
+  let rows=[...B.rows];
+  if(S.f==="weak") rows=rows.filter(r=>r.weak && r.s!==0);
+  else if(S.f!=="all") rows=rows.filter(r=>r.d.ac===S.f);
+  const k=S.sort;
+  rows.sort((a,b)=>{
+    if(k==="n") return S.dir*a.d.n.localeCompare(b.d.n);
+    const g=r=> k==="ctr" ? (r.ctr_pct==null?-Infinity:Math.abs(r.ctr_pct))
+             : k==="w" ? Math.abs(r.w) : k==="lv" ? r.lv : k==="target" ? Math.abs(r.target)
+             : k==="tr" ? r.tr : k==="z" ? r.z : r[k];
+    return S.dir*(g(a)-g(b));
+  });
+  document.getElementById("tblBody").innerHTML = rows.map(r=>{
+    const cls = r.s>0?"L":r.s<0?"S":"F";
+    const dir = r.s>0?"LONG":r.s<0?"SHORT":"FLAT";
+    const ag=[TS.trail(r.i,TS.lastT(),3),TS.trail(r.i,TS.lastT(),6)]
+      .filter(x=>x!=null && Math.sign(x)===Math.sign(r.tr)).length;
+    const s3=TS.trail(r.i,TS.lastT(),3), s6=TS.trail(r.i,TS.lastT(),6);
+    const mk=v=> v==null?'<span class="mini N">–</span>'
+      :`<span class="mini ${v>0?"L":"S"}">${v>0?"L":"S"}</span>`;
+    const order = r.s===0 ? '<span style="color:var(--muted)">— flat —</span>'
+      : r.unit==null ? `<span class="weak">no price</span>`
+      : r.isFx ? `${r.label} ${r.qty>=0?"+":"−"}${compact(Math.abs(r.qty))}`
+      : r.isEtf ? `${r.qty>=0?"+":"−"}${Math.abs(r.qty).toLocaleString()} ${r.label}`
+      : `${r.qty>=0?"+":"−"}${Math.abs(r.qty)} × ${r.label}`;
+    return `<tr class="${r.s===0?"flat":""} ${r.zero?"zero":""}">
+      <td class="l"><span class="nm">${r.d.n}</span><span class="ex">${r.d.t}</span></td>
+      <td class="l"><span class="pill ${cls}">${dir}</span></td>
+      <td>${mk(s3)}</td><td>${mk(s6)}</td>
+      <td><span class="ag" title="${ag}/2 confirm"><i style="width:${ag/2*100}%"></i></span></td>
+      <td>${pctS(r.tr)}</td>
+      <td class="${r.weak?"weak":""}">${(r.z>=0?"+":"−")+Math.abs(r.z).toFixed(2)}σ${r.weak?" ⚠":""}</td>
+      <td class="sep">${pct(r.v,0)}</td>
+      <td>${fx2(r.s*r.lv)}${r.capped?'<span style="color:var(--muted)"> ᶜ</span>':""}</td>
+      <td>${fx3(r.w)}</td>
+      <td>${r.ctr_pct==null?'<span style="color:var(--muted)">n/a</span>':pct(r.ctr_pct,1)}</td>
+      <td class="l sep order">${order}</td>
+      <td>${r.s===0?"—":money(r.target)}</td>
+      <td>${r.gap==null||r.s===0?"—":money(r.gap)}</td>
+    </tr>`;
+  }).join("");
+  const nWeak=B.rows.filter(r=>r.weak && r.s!==0).length;
+  document.getElementById("tblDesc").innerHTML =
+    `${rows.length} markets · ${S.h}-month signal · NAV $${Math.round(S.nav).toLocaleString()}` +
+    (S.micro?" · micros":"") + (S.db>0?` · deadband ±${S.db.toFixed(2)}σ`:"") +
+    ` · <span class="weak">${nWeak} weak ⚠</span>`;
+  document.querySelectorAll("#tbl th[data-k]").forEach(th=>{
+    if(th.dataset.k===S.sort) th.setAttribute("aria-sort", S.dir<0?"descending":"ascending");
+    else th.removeAttribute("aria-sort"); });
+}
+
+let LAST=null;
+function render(){
+  document.getElementById("vtV").textContent = Math.round(S.vt*100)+"%";
+  document.getElementById("capV").textContent = S.cap>30 ? "none" : S.cap.toFixed(1)+"×";
+  document.getElementById("dbV").textContent = S.db>0 ? "±"+S.db.toFixed(2)+"σ" : "off";
+  const B = build(); LAST=B;
+  document.getElementById("capD").textContent = `Binds on ${B.R.capped} markets.`;
+  document.getElementById("dbD").textContent = S.db>0
+    ? `${B.rows.filter(r=>r.s===0).length} markets flat.` : "Weak trends go flat.";
+  const isPaper = S.vt===PAPER.vol_target && S.cap>30 && S.db===0;
+  const isEng   = S.vt===DEF.vol_target && S.cap===DEF.cap && S.db===0;
+  document.getElementById("modNote").textContent =
+    isPaper ? "MOP Eq. 5 exactly — uncapped" :
+    isEng   ? "engine default — 5× cap (a departure from the paper)" : "custom parameters";
+  renderRisk(B); renderTiles(B); renderSleeves(B); renderTop(B); renderTable(B);
+}
+
+/* controls */
+document.getElementById("segH").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return; S.h=b.dataset.h;
+  [...document.querySelectorAll("#segH button")].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  render(); });
+document.getElementById("segF").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return; S.f=b.dataset.f;
+  [...document.querySelectorAll("#segF button")].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  renderTable(LAST); });
+document.querySelectorAll("#tbl th[data-k]").forEach(th=>{
+  th.addEventListener("click",()=>{
+    if(S.sort===th.dataset.k) S.dir*=-1; else { S.sort=th.dataset.k; S.dir=th.dataset.k==="n"?1:-1; }
+    renderTable(LAST); }); });
+const vtR=document.getElementById("vtR"), capR=document.getElementById("capR"),
+      dbR=document.getElementById("dbR"), navI=document.getElementById("navInput");
+vtR.addEventListener("input",e=>{ S.vt=+e.target.value/100; render(); });
+capR.addEventListener("input",e=>{ const v=+e.target.value; S.cap=v>30?1e9:v; render(); });
+dbR.addEventListener("input",e=>{ S.db=+e.target.value/100; render(); });
+navI.addEventListener("input",e=>{ const v=+e.target.value; if(v>=10000){ S.nav=v; render(); } });
+document.getElementById("navPresets").innerHTML =
+  [1000000,5000000,10000000,25000000].map(v=>`<button data-nav="${v}">$${compact(v)}</button>`).join("");
+document.getElementById("navPresets").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  S.nav=+b.dataset.nav; navI.value=S.nav; render(); });
+document.getElementById("microChk").addEventListener("change",e=>{ S.micro=e.target.checked; render(); });
+function applyPreset(vt,cap,db){
+  S.vt=vt; S.cap=cap; S.db=db;
+  vtR.value=Math.round(vt*100); capR.value=cap>30?31:cap; dbR.value=db*100; render(); }
+document.getElementById("resetPaper").addEventListener("click",()=>
+  applyPreset(PAPER.vol_target, PAPER.cap==null?1e9:PAPER.cap, 0));
+document.getElementById("resetEng").addEventListener("click",()=>
+  applyPreset(DEF.vol_target, DEF.cap, 0));
+document.getElementById("copyBtn").addEventListener("click", async e=>{
+  const rows=(LAST?LAST.rows:[]).filter(r=>r.s!==0 && r.qty!=null && r.qty!==0);
+  const txt=[`TSMOM orders — ${DATA.month_end} — ${S.h}m signal — NAV $${S.nav.toLocaleString()}`
+    + ` — vol ${Math.round(S.vt*100)}% cap ${S.cap>30?"none":S.cap+"×"}`
+    + (S.db>0?` deadband ±${S.db.toFixed(2)}σ`:"") + (S.micro?" micros":""),
+    ...rows.map(r=>`${r.qty>0?"BUY ":"SELL"} ${r.isFx?compact(Math.abs(r.qty))+" USD":Math.abs(r.qty).toLocaleString()+(r.isEtf?" sh":"")} ${r.label}`
+      .padEnd(30)+`${r.d.n}${r.weak?"  [WEAK SIGNAL]":""}`)].join("\n");
+  try{ await navigator.clipboard.writeText(txt); e.target.textContent="Copied ✓";
+       setTimeout(()=>e.target.textContent="Copy orders",1600); }
+  catch{ e.target.textContent="Copy blocked"; setTimeout(()=>e.target.textContent="Copy orders",1600); }
+});
+document.getElementById("asof").textContent =
+  `Signals at the ${DATA.month_end} month-end; prices through ${DATA.asof}.`;
+document.getElementById("cw").textContent=DATA.corr_window;
+document.getElementById("sh").textContent=Math.round(DATA.shrink*100)+"%";
+try{ const s=JSON.parse(localStorage.getItem("tsmom_console")||"null");
+  if(s){ if(s.vt){S.vt=s.vt; vtR.value=Math.round(s.vt*100);}
+         if(s.cap){S.cap=s.cap; capR.value=s.cap>30?31:s.cap;}
+         if(s.db){S.db=s.db; dbR.value=s.db*100;}
+         if(s.nav){S.nav=s.nav; navI.value=s.nav;}
+         if(s.micro){S.micro=true; document.getElementById("microChk").checked=true;} } }catch{}
+["input","change","click"].forEach(ev=>document.addEventListener(ev,()=>{
+  try{ localStorage.setItem("tsmom_console", JSON.stringify(
+    {vt:S.vt,cap:S.cap,db:S.db,nav:S.nav,micro:S.micro})); }catch{} }));
+render();
+</script>

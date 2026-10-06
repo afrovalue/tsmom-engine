@@ -1,0 +1,82 @@
+name,asset_class,ticker,source_type,exec_ticker,notes
+WTI Crude,Commodity,CL=F,futures,CL=F,NYMEX
+Brent Crude,Commodity,BZ=F,futures,BZ=F,ICE
+RBOB Gasoline,Commodity,RB=F,futures,RB=F,NYMEX
+Heating Oil,Commodity,HO=F,futures,HO=F,NYMEX
+Natural Gas,Commodity,UNG,etf,UNG,ETF: Yahoo NG=F splice distorts 12m returns
+Gold,Commodity,GC=F,futures,GC=F,COMEX
+Silver,Commodity,SI=F,futures,SI=F,COMEX
+Copper,Commodity,HG=F,futures,HG=F,COMEX
+Platinum,Commodity,PL=F,futures,PL=F,NYMEX
+Palladium,Commodity,PA=F,futures,PA=F,NYMEX
+Corn,Commodity,ZC=F,futures,ZC=F,CBOT
+Wheat CBOT,Commodity,ZW=F,futures,ZW=F,CBOT SRW
+Wheat KC,Commodity,KE=F,futures,KE=F,CBOT HRW (AQR: milling wheat analogue)
+Soybeans,Commodity,ZS=F,futures,ZS=F,CBOT
+Soybean Meal,Commodity,ZM=F,futures,ZM=F,CBOT
+Soybean Oil,Commodity,ZL=F,futures,ZL=F,CBOT (AQR: palm oil analogue)
+Oats,Commodity,ZO=F,futures,ZO=F,CBOT - thin; liquidity screen decides
+Rough Rice,Commodity,ZR=F,futures,ZR=F,CBOT - thin; in AQR table
+Coffee,Commodity,KC=F,futures,KC=F,ICE Arabica
+Cotton,Commodity,CT=F,futures,CT=F,ICE
+Sugar,Commodity,SB=F,futures,SB=F,ICE #11
+Cocoa,Commodity,CC=F,futures,CC=F,ICE
+Orange Juice,Commodity,OJ=F,futures,OJ=F,ICE - thin; in AQR table
+Live Cattle,Commodity,LE=F,futures,LE=F,CME
+Feeder Cattle,Commodity,GF=F,futures,GF=F,CME - in AQR table
+Lean Hogs,Commodity,HE=F,futures,HE=F,CME
+Uranium,Commodity,URA,etf,URA,ETF - miners proxy for uranium complex
+S&P 500,Equity,ES=F,futures,ES=F,CME e-mini
+Nasdaq 100,Equity,NQ=F,futures,NQ=F,CME e-mini
+Dow,Equity,YM=F,futures,YM=F,CBOT e-mini
+Russell 2000,Equity,RTY=F,futures,RTY=F,CME e-mini
+Nikkei 225,Equity,NKD=F,futures,NKD=F,CME USD-denominated
+Euro Stoxx 50,Equity,FEZ,etf,FEZ,unhedged USD - sole European equity exposure (eurozone only: no UK/CH/SE)
+Australia,Equity,EWA,etf,EWA,unhedged USD
+Canada,Equity,EWC,etf,EWC,unhedged USD
+Hong Kong,Equity,EWH,etf,EWH,unhedged USD
+Singapore,Equity,EWS,etf,EWS,unhedged USD
+Korea,Equity,EWY,etf,EWY,AQR KOSPI 200 analogue
+Taiwan,Equity,EWT,etf,EWT,AQR MSCI Taiwan analogue
+India,Equity,INDA,etf,INDA,AQR SGX CNX Nifty analogue
+China A-Shares,Equity,ASHR,etf,ASHR,AQR China A-Shares analogue
+China Large Cap,Equity,FXI,etf,FXI,AQR HSCEI analogue
+Brazil,Equity,EWZ,etf,EWZ,AQR Ibovespa analogue
+Mexico,Equity,EWW,etf,EWW,unhedged USD
+South Africa,Equity,EZA,etf,EZA,AQR SA All Share analogue - thin; screen decides
+Emerging Broad,Equity,EEM,etf,EEM,unhedged USD
+UK,Equity,EWU,etf,EWU,unhedged USD - adds GBP exposure
+Switzerland,Equity,EWL,etf,EWL,unhedged USD - adds CHF exposure
+Sweden,Equity,EWD,etf,EWD,"unhedged USD - ADV ~$5M, below the screen; kept by explicit override"
+US 2Y Note,Bond,ZT=F,futures,ZT=F,CBOT
+US 5Y Note,Bond,ZF=F,futures,ZF=F,CBOT
+US 10Y Note,Bond,ZN=F,futures,ZN=F,CBOT
+US 30Y Bond,Bond,ZB=F,futures,ZB=F,CBOT
+Intl Treasuries Broad,Bond,BWX,etf,BWX,ex-US sovereign unhedged - thin; screen decides
+US TIPS,Bond,TIP,etf,TIP,inflation-linked
+EM Sovereign USD,Bond,EMB,etf,EMB,AQR emerging credit analogue
+EM Local Currency,Bond,EMLC,etf,EMLC,local-currency EM debt
+US HY Credit,Bond,HYG,etf,HYG,AQR N. American HY analogue
+US IG Credit,Bond,LQD,etf,LQD,AQR N. American IG analogue
+EUR/USD,FX,6E=F,futures,6E=F,CME
+JPY/USD,FX,6J=F,futures,6J=F,CME
+GBP/USD,FX,6B=F,futures,6B=F,CME
+AUD/USD,FX,6A=F,futures,6A=F,CME
+CAD/USD,FX,6C=F,futures,6C=F,CME
+CHF/USD,FX,6S=F,futures,6S=F,CME
+NZD/USD,FX,6N=F,futures,6N=F,CME
+Dollar Index,FX,UUP,etf,UUP,DX=F delisted from Yahoo
+USD/MXN,FX,USDMXN=X,fx_spot,USDMXN,spot - carry excluded
+USD/BRL,FX,USDBRL=X,fx_spot,USDBRL,spot - carry excluded; high carry
+USD/ZAR,FX,USDZAR=X,fx_spot,USDZAR,spot - carry excluded; high carry
+USD/TRY,FX,USDTRY=X,fx_spot,USDTRY,spot - carry excluded; VERY high carry
+USD/INR,FX,USDINR=X,fx_spot,USDINR,spot - carry excluded
+USD/KRW,FX,USDKRW=X,fx_spot,USDKRW,spot - carry excluded
+USD/TWD,FX,USDTWD=X,fx_spot,USDTWD,spot - carry excluded
+USD/PLN,FX,USDPLN=X,fx_spot,USDPLN,spot - carry excluded
+USD/CNY,FX,USDCNY=X,fx_spot,USDCNY,spot - carry excluded
+USD/SGD,FX,USDSGD=X,fx_spot,USDSGD,spot - carry excluded
+USD/ILS,FX,USDILS=X,fx_spot,USDILS,spot - carry excluded
+USD/CLP,FX,USDCLP=X,fx_spot,USDCLP,spot - carry excluded
+Bitcoin,Crypto,BTC=F,futures,BTC=F,"CME 5 BTC - regulated futures, self-financing; from Dec 2017"
+Ethereum,Crypto,ETH=F,futures,ETH=F,"CME 50 ETH - from Feb 2021, shorter history"

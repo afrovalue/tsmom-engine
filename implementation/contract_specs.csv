@@ -1,0 +1,82 @@
+ticker,exec_type,exec_ticker,multiplier,price_factor,unit,micro_symbol,micro_multiplier,notes
+CL=F,futures,CL=F,1000.0,1.0,USD/bbl,MCL,100.0,NYMEX
+BZ=F,futures,BZ=F,1000.0,1.0,USD/bbl,,,ICE
+RB=F,futures,RB=F,42000.0,1.0,USD/gal,,,NYMEX
+HO=F,futures,HO=F,42000.0,1.0,USD/gal,,,NYMEX
+UNG,etf,UNG,1.0,1.0,USD/share,,,ETF: Yahoo NG=F splice distorts 12m returns
+GC=F,futures,GC=F,100.0,1.0,USD/oz,MGC,10.0,COMEX
+SI=F,futures,SI=F,5000.0,1.0,USD/oz,SIL,1000.0,COMEX
+HG=F,futures,HG=F,25000.0,1.0,USD/lb,MHG,2500.0,COMEX
+PL=F,futures,PL=F,50.0,1.0,USD/oz,,,NYMEX
+PA=F,futures,PA=F,100.0,1.0,USD/oz,,,NYMEX
+ZC=F,futures,ZC=F,5000.0,0.01,cents/bu,,,CBOT
+ZW=F,futures,ZW=F,5000.0,0.01,cents/bu,,,CBOT SRW
+KE=F,futures,KE=F,5000.0,0.01,cents/bu,,,CBOT HRW (AQR: milling wheat analogue)
+ZS=F,futures,ZS=F,5000.0,0.01,cents/bu,,,CBOT
+ZM=F,futures,ZM=F,100.0,1.0,USD/short ton,,,CBOT
+ZL=F,futures,ZL=F,60000.0,0.01,cents/lb,,,CBOT (AQR: palm oil analogue)
+ZO=F,futures,ZO=F,5000.0,0.01,cents/bu,,,CBOT - thin; liquidity screen decides
+ZR=F,futures,ZR=F,2000.0,0.01,cents/cwt,,,CBOT - thin; in AQR table
+KC=F,futures,KC=F,37500.0,0.01,cents/lb,,,ICE Arabica
+CT=F,futures,CT=F,50000.0,0.01,cents/lb,,,ICE
+SB=F,futures,SB=F,112000.0,0.01,cents/lb,,,ICE #11
+CC=F,futures,CC=F,10.0,1.0,USD/tonne,,,ICE
+OJ=F,futures,OJ=F,15000.0,0.01,cents/lb,,,ICE - thin; in AQR table
+LE=F,futures,LE=F,40000.0,0.01,cents/lb,,,CME
+GF=F,futures,GF=F,50000.0,0.01,cents/lb,,,CME - in AQR table
+HE=F,futures,HE=F,40000.0,0.01,cents/lb,,,CME
+URA,etf,URA,1.0,1.0,USD/share,,,ETF - miners proxy for uranium complex
+ES=F,futures,ES=F,50.0,1.0,index pt,MES,5.0,CME e-mini
+NQ=F,futures,NQ=F,20.0,1.0,index pt,MNQ,2.0,CME e-mini
+YM=F,futures,YM=F,5.0,1.0,index pt,MYM,0.5,CBOT e-mini
+RTY=F,futures,RTY=F,50.0,1.0,index pt,M2K,5.0,CME e-mini
+NKD=F,futures,NKD=F,5.0,1.0,index pt,,,CME USD-denominated
+FEZ,etf,FEZ,1.0,1.0,USD/share,,,unhedged USD - sole European equity exposure (eurozone only: no UK/CH/SE)
+EWA,etf,EWA,1.0,1.0,USD/share,,,unhedged USD
+EWC,etf,EWC,1.0,1.0,USD/share,,,unhedged USD
+EWH,etf,EWH,1.0,1.0,USD/share,,,unhedged USD
+EWS,etf,EWS,1.0,1.0,USD/share,,,unhedged USD
+EWY,etf,EWY,1.0,1.0,USD/share,,,AQR KOSPI 200 analogue
+EWT,etf,EWT,1.0,1.0,USD/share,,,AQR MSCI Taiwan analogue
+INDA,etf,INDA,1.0,1.0,USD/share,,,AQR SGX CNX Nifty analogue
+ASHR,etf,ASHR,1.0,1.0,USD/share,,,AQR China A-Shares analogue
+FXI,etf,FXI,1.0,1.0,USD/share,,,AQR HSCEI analogue
+EWZ,etf,EWZ,1.0,1.0,USD/share,,,AQR Ibovespa analogue
+EWW,etf,EWW,1.0,1.0,USD/share,,,unhedged USD
+EZA,etf,EZA,1.0,1.0,USD/share,,,AQR SA All Share analogue - thin; screen decides
+EEM,etf,EEM,1.0,1.0,USD/share,,,unhedged USD
+EWU,etf,EWU,1.0,1.0,USD/share,,,unhedged USD - adds GBP exposure
+EWL,etf,EWL,1.0,1.0,USD/share,,,unhedged USD - adds CHF exposure
+EWD,etf,EWD,1.0,1.0,USD/share,,,"unhedged USD - ADV ~$5M, below the screen; kept by explicit override"
+ZT=F,futures,ZT=F,2000.0,1.0,pts on 200k face,,,CBOT
+ZF=F,futures,ZF=F,1000.0,1.0,pts on 100k face,,,CBOT
+ZN=F,futures,ZN=F,1000.0,1.0,pts on 100k face,,,CBOT
+ZB=F,futures,ZB=F,1000.0,1.0,pts on 100k face,,,CBOT
+BWX,etf,BWX,1.0,1.0,USD/share,,,ex-US sovereign unhedged - thin; screen decides
+TIP,etf,TIP,1.0,1.0,USD/share,,,inflation-linked
+EMB,etf,EMB,1.0,1.0,USD/share,,,AQR emerging credit analogue
+EMLC,etf,EMLC,1.0,1.0,USD/share,,,local-currency EM debt
+HYG,etf,HYG,1.0,1.0,USD/share,,,AQR N. American HY analogue
+LQD,etf,LQD,1.0,1.0,USD/share,,,AQR N. American IG analogue
+6E=F,futures,6E=F,125000.0,1.0,USD/EUR,M6E,12500.0,CME
+6J=F,futures,6J=F,12500000.0,1.0,USD/JPY,,,CME
+6B=F,futures,6B=F,62500.0,1.0,USD/GBP,M6B,6250.0,CME
+6A=F,futures,6A=F,100000.0,1.0,USD/AUD,M6A,10000.0,CME
+6C=F,futures,6C=F,100000.0,1.0,USD/CAD,,,CME
+6S=F,futures,6S=F,125000.0,1.0,USD/CHF,,,CME
+6N=F,futures,6N=F,100000.0,1.0,USD/NZD,,,CME
+UUP,etf,UUP,1.0,1.0,USD/share,,,DX=F delisted from Yahoo
+USDMXN=X,fx,USDMXN,1.0,1.0,USD notional,,,spot - carry excluded
+USDBRL=X,fx,USDBRL,1.0,1.0,USD notional,,,spot - carry excluded; high carry
+USDZAR=X,fx,USDZAR,1.0,1.0,USD notional,,,spot - carry excluded; high carry
+USDTRY=X,fx,USDTRY,1.0,1.0,USD notional,,,spot - carry excluded; VERY high carry
+USDINR=X,fx,USDINR,1.0,1.0,USD notional,,,spot - carry excluded
+USDKRW=X,fx,USDKRW,1.0,1.0,USD notional,,,spot - carry excluded
+USDTWD=X,fx,USDTWD,1.0,1.0,USD notional,,,spot - carry excluded
+USDPLN=X,fx,USDPLN,1.0,1.0,USD notional,,,spot - carry excluded
+USDCNY=X,fx,USDCNY,1.0,1.0,USD notional,,,spot - carry excluded
+USDSGD=X,fx,USDSGD,1.0,1.0,USD notional,,,spot - carry excluded
+USDILS=X,fx,USDILS,1.0,1.0,USD notional,,,spot - carry excluded
+USDCLP=X,fx,USDCLP,1.0,1.0,USD notional,,,spot - carry excluded
+BTC=F,futures,BTC=F,5.0,1.0,USD/BTC,MBT,0.1,"CME 5 BTC - regulated futures, self-financing; from Dec 2017"
+ETH=F,futures,ETH=F,50.0,1.0,USD/ETH,MET,0.1,"CME 50 ETH - from Feb 2021, shorter history"

@@ -1,0 +1,728 @@
+<title>TSMOM Backtest Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@600&display=swap">
+<style>
+:root{
+  --paper:#f6f7f9; --surface:#fcfdfe; --raised:#f1f3f6; --ink:#10151b; --ink2:#4d565f; --muted:#8a929b;
+  --grid:#e5e8ec; --baseline:#c6ccd2; --border:rgba(16,21,27,.10);
+  --h12:#2a78d6; --h6:#1baf7a; --h3:#eb6834; --accent:#2a78d6;
+  --h12-wash:rgba(42,120,214,.10); --h6-wash:rgba(27,175,122,.10); --h3-wash:rgba(235,104,52,.10);
+  --warn:#fab219; --warn-ink:#7a5200; --chip:#eceff2; --good:#0ca30c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1114; --surface:#161a1f; --raised:#1d2228; --ink:#f2f4f6; --ink2:#b8bec6; --muted:#858c94;
+    --grid:#262b31; --baseline:#3a4048; --border:rgba(255,255,255,.10);
+    --h12:#3987e5; --h6:#199e70; --h3:#d95926; --accent:#3987e5;
+    --h12-wash:rgba(57,135,229,.12); --h6-wash:rgba(25,158,112,.12); --h3-wash:rgba(217,89,38,.12);
+    --warn:#fab219; --warn-ink:#fab219; --chip:#20252b; --good:#0ca30c;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1114; --surface:#161a1f; --raised:#1d2228; --ink:#f2f4f6; --ink2:#b8bec6; --muted:#858c94;
+  --grid:#262b31; --baseline:#3a4048; --border:rgba(255,255,255,.10);
+  --h12:#3987e5; --h6:#199e70; --h3:#d95926; --accent:#3987e5;
+  --h12-wash:rgba(57,135,229,.12); --h6-wash:rgba(25,158,112,.12); --h3-wash:rgba(217,89,38,.12);
+  --warn:#fab219; --warn-ink:#fab219; --chip:#20252b; --good:#0ca30c;
+}
+*{box-sizing:border-box}
+body{background:var(--paper); color:var(--ink); margin:0;
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; font-size:14.5px; line-height:1.5;}
+.wrap{max-width:1080px; margin:0 auto; padding:34px 22px 56px;}
+.eyebrow{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 6px;}
+h1{font-family:"IBM Plex Serif",Georgia,serif; font-weight:600; font-size:30px; margin:0 0 4px; text-wrap:balance;}
+.sub{color:var(--ink2); margin:0 0 20px; max-width:66ch;}
+.sub .mono{font-family:"IBM Plex Mono",monospace; font-size:13px;}
+
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px 18px; margin:0 0 14px;}
+.ctlrow{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin:0 0 14px;}
+.ctl-label{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--muted);}
+.seg{display:flex; background:var(--chip); border-radius:9px; padding:3px; gap:2px;}
+.seg button{border:0; background:transparent; color:var(--ink2); font:inherit; font-size:13px;
+  font-weight:500; padding:5px 13px; border-radius:7px; cursor:pointer;}
+.seg button:hover{color:var(--ink);}
+.seg button[aria-pressed="true"]{background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.10);}
+button:focus-visible, input:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+.sliders{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:22px;}
+.sl label{display:block; font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
+.sl .v{font-family:"IBM Plex Mono",monospace; font-size:19px; font-weight:600; color:var(--ink);}
+.sl .d{font-size:12px; color:var(--muted); min-height:32px;}
+input[type=range]{width:100%; accent-color:var(--accent); margin:6px 0 3px;}
+.reset{border:1px solid var(--border); background:var(--raised); color:var(--ink2); font:inherit;
+  font-size:12px; padding:4px 11px; border-radius:6px; cursor:pointer;}
+.reset:hover{color:var(--ink); border-color:var(--baseline);}
+.mod{color:var(--warn-ink); font-family:"IBM Plex Mono",monospace; font-size:11.5px;}
+
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(152px,1fr)); gap:10px; margin:0 0 14px;}
+.tile{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px;}
+.tile .lab{font-size:12px; color:var(--muted); margin-bottom:2px;}
+.tile .val{font-size:22px; font-weight:600; letter-spacing:-.01em;}
+.tile .note{font-size:12px; color:var(--ink2); font-family:"IBM Plex Mono",monospace; margin-top:2px;}
+.tile.hero{border-color:color-mix(in srgb,var(--accent) 45%, var(--border));}
+.delta{font-family:"IBM Plex Mono",monospace; font-size:11.5px; margin-top:2px;}
+.delta.up{color:var(--good);} .delta.dn{color:var(--h3);}
+
+.card-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap;}
+.card-head h2{font-size:14px; font-weight:600; margin:0;}
+.desc{font-size:12.5px; color:var(--muted); margin:1px 0 8px;}
+.legend{display:flex; gap:14px; font-size:12.5px; color:var(--ink2);}
+.legend .k{display:inline-flex; align-items:center; gap:6px;}
+.legend .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media (max-width:760px){ .grid2{grid-template-columns:1fr} }
+.chart-box{position:relative;}
+.chart-box svg{display:block; width:100%; height:auto;}
+.tip{position:absolute; pointer-events:none; background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; padding:7px 10px; font-size:12px; line-height:1.45; box-shadow:0 4px 14px rgba(0,0,0,.13);
+  display:none; z-index:5; min-width:120px;}
+.tip .d{font-family:"IBM Plex Mono",monospace; color:var(--muted); font-size:11px; margin-bottom:2px;}
+.tip .row{display:flex; justify-content:space-between; gap:14px;}
+.tip .row b{font-family:"IBM Plex Mono",monospace; font-weight:500;}
+.axis{font-family:"IBM Plex Mono",monospace; font-size:10.5px; fill:var(--muted);}
+.endlab{font-family:"IBM Plex Mono",monospace; font-size:11px; fill:var(--ink2);}
+
+.sweep{display:grid; grid-template-columns:64px 1fr 168px; gap:12px; align-items:center; padding:6px 0;}
+.sweep + .sweep{border-top:1px solid var(--grid);}
+.sweep .cap{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink2);}
+.sweep .cap.cur{color:var(--ink); font-weight:600;}
+.sbar{position:relative; height:15px; background:var(--raised); border-radius:4px; overflow:hidden;}
+.sbar .f{position:absolute; top:0; bottom:0; border-radius:4px; background:var(--accent);}
+.sbar .z{position:absolute; top:-2px; bottom:-2px; width:1px; background:var(--baseline);}
+.sweep .m{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted); text-align:right;}
+.sweep .m b{color:var(--ink); font-weight:600;}
+
+.tblwrap{overflow-x:auto;}
+table{border-collapse:collapse; width:100%; font-size:13px;}
+th{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  font-weight:500; text-align:right; padding:6px 10px; border-bottom:1px solid var(--baseline);}
+th:first-child{text-align:left;}
+td{padding:5px 10px; text-align:right; font-family:"IBM Plex Mono",monospace;
+  font-variant-numeric:tabular-nums; border-bottom:1px solid var(--grid); color:var(--ink);}
+td:first-child{text-align:left; color:var(--ink2);}
+tr:last-child td{border-bottom:0;}
+details.tbl summary{cursor:pointer; font-size:13px; color:var(--ink2); font-weight:500; padding:8px 2px;}
+.foot{color:var(--muted); font-size:12.5px; max-width:80ch; margin-top:22px;}
+.foot .mono{font-family:"IBM Plex Mono",monospace;}
+@media (prefers-reduced-motion: no-preference){ .seg button{transition:background .12s, color .12s;} }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Moskowitz · Ooi · Pedersen — Time Series Momentum</p>
+  <h1>Backtest Lab</h1>
+  <p class="sub">Every number below is recomputed from the raw monthly series as you move the
+    controls — change the vol target, the leverage cap or the deadband and the whole backtest
+    rebuilds. <span class="mono" id="subSpan"></span></p>
+
+  <div class="panel">
+    <div class="ctlrow">
+      <span class="ctl-label">Signal</span>
+      <div class="seg" id="segH">
+        <button data-h="3">3m</button><button data-h="6">6m</button>
+        <button data-h="12" aria-pressed="true">12m</button><button data-h="cmp">Compare</button>
+      </div>
+      <span class="ctl-label">Window</span>
+      <div class="seg" id="segR">
+        <button data-r="all" aria-pressed="true">Full</button><button data-r="120">10y</button>
+        <button data-r="60">5y</button><button data-r="36">3y</button>
+        <button data-r="12">1y</button><button data-r="ytd">YTD</button>
+      </div>
+      <button class="reset" id="resetPaper">Paper (uncapped)</button><button class="reset" id="resetEng">Engine default (5×)</button>
+      <span class="mod" id="modNote"></span>
+    </div>
+    <div class="sliders">
+      <div class="sl">
+        <label for="vtR">Vol target per instrument</label>
+        <span class="v" id="vtV">40%</span>
+        <input type="range" id="vtR" min="5" max="60" step="1" value="40">
+        <div class="d">MOP Eq. 5 uses 40%. Scales every position — mostly moves portfolio
+          vol, and changes Sharpe only through how often the cap binds.</div>
+      </div>
+      <div class="sl">
+        <label for="capR">Leverage cap per instrument</label>
+        <span class="v" id="capV">5.0×</span>
+        <input type="range" id="capR" min="1" max="31" step="0.5" value="5">
+        <div class="d">MOP Eq. 5 is <b>uncapped</b>; this engine ships a 5× cap because uncapped sizing demands 30×+ on 2Y notes. <span id="capBind"></span></div>
+      </div>
+      <div class="sl">
+        <label for="dbR">Deadband</label>
+        <span class="v" id="dbV">off</span>
+        <input type="range" id="dbR" min="0" max="200" step="5" value="0">
+        <div class="d">Go flat when the trailing return is within ±this of zero. Not in the
+          paper — MOP is pure sign. Tests whether weak trends are worth trading.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="card-head"><div><h2>Performance &amp; risk ratios</h2>
+        <p class="desc" id="ratDesc"></p></div></div>
+      <div class="tblwrap"><table id="ratTable"></table></div>
+    </div>
+    <div class="panel">
+      <div class="card-head"><div><h2>Average positioning over the window</h2>
+        <p class="desc" id="posDesc"></p></div></div>
+      <div id="posBody"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="card-head"><div><h2>Growth of $1</h2><p class="desc" id="eqDesc"></p></div>
+      <div class="legend" id="eqLegend"></div></div>
+    <div class="chart-box" id="eqChart"></div>
+  </div>
+
+  <div class="panel">
+    <div class="card-head"><div><h2>Drawdown</h2>
+      <p class="desc">Decline from the running peak, monthly.</p></div>
+      <div class="legend" id="ddLegend"></div></div>
+    <div class="chart-box" id="ddChart"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="card-head"><div><h2>Rolling Sharpe — 36m</h2>
+        <p class="desc">Annualized, three-year window.</p></div>
+        <div class="legend" id="rsLegend"></div></div>
+      <div class="chart-box" id="rsChart"></div>
+    </div>
+    <div class="panel">
+      <div class="card-head"><div><h2>Calendar-year returns</h2>
+        <p class="desc" id="yrDesc"></p></div></div>
+      <div class="chart-box" id="yrChart"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="card-head"><div><h2>Monthly returns</h2>
+      <p class="desc" id="mrDesc"></p></div>
+      <div class="legend" id="mrLegend"></div></div>
+    <div class="chart-box" id="mrChart"></div>
+  </div>
+
+  <div class="panel">
+    <div class="card-head"><div><h2>Versus the S&amp;P 500</h2>
+      <p class="desc" id="beDesc"></p></div></div>
+    <div class="tblwrap"><table id="beTable"></table></div>
+  </div>
+
+  <div class="panel">
+    <div class="card-head"><div><h2>Sharpe across leverage caps</h2>
+      <p class="desc" id="swDesc"></p></div></div>
+    <div id="sweep"></div>
+  </div>
+
+  <div class="panel">
+    <div class="card-head"><div><h2>Sleeves — growth of $1</h2>
+      <p class="desc" id="slDesc"></p></div></div>
+    <div class="grid2" id="slCharts" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))"></div>
+  </div>
+
+  <details class="tbl">
+    <summary>Table view — calendar-year returns, all horizons, current parameters</summary>
+    <div class="panel"><div class="tblwrap" id="yrTable"></div></div>
+  </details>
+
+  <p class="foot">Data: Yahoo Finance futures, ETFs and FX spot, monthly since 2005; gross of
+    transaction costs and fees. Vol is the paper's EWMA (Eq. 1,
+    <span class="mono">δ=60/61</span>, annualized ×261, lagged one day); positions per Eq. 5,
+    decided at each month-end and held one month. Statistics recompute over the selected window
+    with the equity curve rebased to $1. The EM FX legs price the trend but exclude the interest
+    differential, so their contribution is overstated. Backtests are not forecasts, and these
+    are analytics, not investment advice.</p>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+/*__CORE__*/
+
+const HUES = {"3":{c:"var(--h3)",w:"var(--h3-wash)",name:"3m"},
+              "6":{c:"var(--h6)",w:"var(--h6-wash)",name:"6m"},
+              "12":{c:"var(--h12)",w:"var(--h12-wash)",name:"12m"}};
+const ORDER = ["12","6","3"];
+const DEF = DATA.defaults;
+const PAPER = DATA.paper || {vol_target:0.40, cap:null, deadband:0};
+const PAPER_P = {vt:PAPER.vol_target, cap:PAPER.cap==null?1e9:PAPER.cap, db:0};
+const isPaper = () => state.vt===PAPER_P.vt && state.cap>30 && state.db===0;
+const isEng   = () => state.vt===DEF.vol_target && state.cap===DEF.cap && state.db===0;
+let state = {h:"12", r:"all", vt:DEF.vol_target, cap:DEF.cap, db:0};
+const P = () => ({vt:state.vt, cap:state.cap, db:state.db});
+const cache = new Map();
+function bt(k, p, key){
+  const id = `${k}|${p.vt}|${p.cap}|${p.db}|${key||""}`;
+  if(!cache.has(id)) cache.set(id, TS.backtest(k, p, key ? TS.acSubset(key) : null));
+  return cache.get(id);
+}
+
+const fmtPct = (x,d=1)=> (x>=0?"+":"") + (100*x).toFixed(d) + "%";
+const fmtPctU = (x,d=1)=> (100*x).toFixed(d) + "%";
+const fmtX = x => "$" + x.toFixed(2);
+const monDate = s => { const [y,m]=s.split("-");
+  return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m-1]+" "+y; };
+
+function slice(k, p){
+  const b = bt(k, p || P());
+  const n = b.ret.length;
+  if(state.r === "ytd"){
+    const yr = b.dates[n-1].slice(0,4);
+    const i0 = b.dates.findIndex(d => d.slice(0,4) === yr);
+    return {dates:b.dates.slice(i0), ret:b.ret.slice(i0)};
+  }
+  const kk = state.r==="all" ? n : Math.min(+state.r, n);
+  return {dates:b.dates.slice(n-kk), ret:b.ret.slice(n-kk)};
+}
+const activeHs = () => state.h==="cmp" ? ORDER : [state.h];
+
+/* ---------- svg helpers ---------- */
+let W=940, HL=250, PAD={l:46,r:74,t:12,b:26};
+const DIMS_MAIN=[940,250,{l:46,r:74,t:12,b:26}], DIMS_HALF=[460,230,{l:42,r:20,t:14,b:26}];
+function setDims([w,h,p]){ W=w; HL=h; PAD={...p}; }
+function sx(i,n){ return PAD.l + (W-PAD.l-PAD.r) * (n<=1?0:i/(n-1)); }
+function scaleY(min,max,h=HL){ return v => PAD.t + (h-PAD.t-PAD.b)*(1-(v-min)/(max-min||1)); }
+function niceTicks(min,max,n=4){
+  const span=max-min||1, step0=span/n, mag=Math.pow(10,Math.floor(Math.log10(step0)));
+  const step=[1,2,2.5,5,10].map(m=>m*mag).find(s=>span/s<=n+1)||mag*10;
+  const t=[]; for(let v=Math.ceil(min/step)*step; v<=max+1e-12; v+=step) t.push(+v.toFixed(10));
+  return t;
+}
+function gridAndAxis(ticks, sy, fmt){
+  let g="";
+  for(const t of ticks){ const y=sy(t);
+    g+=`<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${y}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`;
+    g+=`<text class="axis" x="${PAD.l-7}" y="${y+3.5}" text-anchor="end">${fmt(t)}</text>`; }
+  return g;
+}
+function xLabels(dates){
+  const n=dates.length, want=Math.min(W<600?5:7,n), st=Math.max(1,Math.round(n/want));
+  let g="";
+  for(let i=0;i<n;i+=st){ const y=dates[i].slice(0,4), m=dates[i].slice(5,7);
+    g+=`<text class="axis" x="${sx(i,n)}" y="${HL-7}" text-anchor="middle">${n>90? y : m+"/"+y.slice(2)}</text>`; }
+  return g;
+}
+const linePath = (v,n,sy)=> v.map((x,i)=>(i?"L":"M")+sx(i,n).toFixed(1)+" "+sy(x).toFixed(1)).join("");
+const endDot = (i,n,v,sy,c)=> `<circle cx="${sx(i,n)}" cy="${sy(v)}" r="4.5" fill="${c}" stroke="var(--surface)" stroke-width="2"/>`;
+
+function attachHover(box, dates, series, sy){
+  const cW=W, cPL=PAD.l, cPR=PAD.r;
+  const xpos=(i,n)=> cPL + (cW-cPL-cPR)*(n<=1?0:i/(n-1));
+  const svg=box.querySelector("svg"); if(!svg) return;
+  const tip=document.createElement("div"); tip.className="tip"; box.appendChild(tip);
+  const ns="http://www.w3.org/2000/svg";
+  const vl=document.createElementNS(ns,"line");
+  vl.setAttribute("stroke","var(--baseline)"); vl.setAttribute("stroke-width","1");
+  vl.setAttribute("y1",PAD.t); vl.setAttribute("y2",HL-PAD.b); vl.style.display="none";
+  svg.appendChild(vl);
+  const dots=series.map(s=>{ const c=document.createElementNS(ns,"circle");
+    c.setAttribute("r","4"); c.setAttribute("fill",s.color);
+    c.setAttribute("stroke","var(--surface)"); c.setAttribute("stroke-width","2");
+    c.style.display="none"; svg.appendChild(c); return c; });
+  const n=dates.length;
+  svg.addEventListener("mousemove",ev=>{
+    const r=svg.getBoundingClientRect();
+    let i=Math.round(((ev.clientX-r.left)*(cW/r.width)-cPL)/((cW-cPL-cPR)/(n-1)));
+    i=Math.max(0,Math.min(n-1,i));
+    const x=xpos(i,n);
+    vl.setAttribute("x1",x); vl.setAttribute("x2",x); vl.style.display="";
+    let rows="";
+    series.forEach((s,j)=>{ const v=s.vals[i];
+      if(v==null){dots[j].style.display="none"; return;}
+      dots[j].setAttribute("cx",x); dots[j].setAttribute("cy",sy(v)); dots[j].style.display="";
+      rows+=`<div class="row"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${s.color};margin-right:5px"></span>${s.key}</span><b>${s.fmt(v)}</b></div>`; });
+    tip.innerHTML=`<div class="d">${monDate(dates[i])}</div>`+rows;
+    tip.style.display="block";
+    const bw=box.clientWidth, tw=tip.offsetWidth;
+    let lx=(x/cW)*bw+12; if(lx+tw>bw-4) lx=(x/cW)*bw-tw-12;
+    tip.style.left=lx+"px"; tip.style.top="10px";
+  });
+  svg.addEventListener("mouseleave",()=>{ tip.style.display="none"; vl.style.display="none";
+    dots.forEach(d=>d.style.display="none"); });
+}
+
+/* ---------- renderers ---------- */
+function renderTiles(){
+  const el=document.getElementById("tiles");
+  const hs=activeHs(); const main=state.h==="cmp"?"12":state.h;
+  const S={}; hs.forEach(h=>S[h]=TS.stats(slice(h).ret));
+  const m=S[main];
+  // baseline is MOP Eq. 5 as written: 40% target, NO cap, no deadband
+  const base=TS.stats(slice(main, PAPER_P).ret);
+  const changed = !isPaper();
+  const dl=(v,b,inv)=>{ if(!changed) return "";
+    const d=v-b; if(Math.abs(d)<1e-9) return `<div class="delta">= baseline</div>`;
+    const good=inv? d<0 : d>0;
+    return `<div class="delta ${good?"up":"dn"}">${d>0?"+":""}${(Math.abs(d)>=1? d.toFixed(2): d.toFixed(2))} vs paper</div>`; };
+  const dlp=(v,b,inv)=>{ if(!changed) return "";
+    const d=(v-b)*100; if(Math.abs(d)<0.05) return `<div class="delta">= baseline</div>`;
+    const good=inv? d<0 : d>0;
+    return `<div class="delta ${good?"up":"dn"}">${d>0?"+":""}${d.toFixed(1)}pp vs paper</div>`; };
+  const defs=[
+    ["Sharpe ratio", m.sharpe.toFixed(2), "ann. return / ann. vol", true, dl(m.sharpe,base.sharpe)],
+    ["Annualized return", fmtPct(m.annR), "total "+fmtPct(m.total,0), false, dlp(m.annR,base.annR)],
+    ["Portfolio vol", fmtPctU(m.annV), "annualized", false, dlp(m.annV,base.annV,true)],
+    ["Max drawdown", fmtPctU(m.maxdd), "peak to trough", false, dlp(m.maxdd,base.maxdd)],
+    ["Longest drawdown", m.ddMonths+" mo", "≈ "+Math.round(m.ddMonths*30.44).toLocaleString()+" days", false, ""],
+    ["Hit rate", fmtPctU(m.hit,0), m.n+" months", false, ""],
+  ];
+  el.innerHTML = defs.map(([lab,val,note,hero,delta])=>{
+    let extra="";
+    if(state.h==="cmp"){
+      const f = lab==="Sharpe ratio" ? h=>S[h].sharpe.toFixed(2)
+        : lab==="Annualized return" ? h=>fmtPct(S[h].annR)
+        : lab==="Portfolio vol" ? h=>fmtPctU(S[h].annV)
+        : lab==="Max drawdown" ? h=>fmtPctU(S[h].maxdd)
+        : lab==="Longest drawdown" ? h=>S[h].ddMonths+"mo" : h=>fmtPctU(S[h].hit,0);
+      extra=`<div class="note">3m ${f("3")} · 6m ${f("6")}</div>`;
+    }
+    return `<div class="tile${hero?" hero":""}"><div class="lab">${lab}${state.h==="cmp"?"":" · "+HUES[main].name}</div>
+      <div class="val">${val}</div><div class="note">${note}</div>${delta}${extra}</div>`;
+  }).join("");
+}
+
+function renderLegend(el,hs){
+  if(!el) return;
+  el.innerHTML = hs.length<2 ? "" :
+    hs.map(h=>`<span class="k"><span class="dot" style="background:${HUES[h].c}"></span>${HUES[h].name}</span>`).join("");
+}
+
+function renderEquity(){
+  setDims(DIMS_MAIN);
+  const hs=activeHs(), box=document.getElementById("eqChart");
+  const data=hs.map(h=>{ const s=slice(h); return {h, dates:s.dates, st:TS.stats(s.ret)}; });
+  const dates=data[0].dates;
+  if(!dates.length){ box.innerHTML=`<p class="desc">No months in this window.</p>`; return; }
+  let lo=1, hi=1;
+  data.forEach(d=>{ lo=Math.min(lo,...d.st.eq); hi=Math.max(hi,...d.st.eq); });
+  const pad=(hi-lo)*0.08||0.05, sy=scaleY(lo-pad,hi+pad);
+  let svg=gridAndAxis(niceTicks(lo-pad,hi+pad,4),sy,t=>"$"+t.toFixed(2))+xLabels(dates);
+  data.forEach(d=>{ const n=d.dates.length;
+    if(hs.length===1) svg+=`<path d="${linePath(d.st.eq,n,sy)}L${sx(n-1,n)} ${sy(lo-pad)}L${sx(0,n)} ${sy(lo-pad)}Z" fill="${HUES[d.h].w}"/>`;
+    svg+=`<path d="${linePath(d.st.eq,n,sy)}" fill="none" stroke="${HUES[d.h].c}" stroke-width="2" stroke-linejoin="round"/>`;
+    svg+=endDot(n-1,n,d.st.eq[n-1],sy,HUES[d.h].c);
+    svg+=`<text class="endlab" x="${sx(n-1,n)+9}" y="${sy(d.st.eq[n-1])+4}">${fmtX(d.st.eq[n-1])}</text>`; });
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${HL}" role="img" aria-label="Equity curve">${svg}</svg>`;
+  renderLegend(document.getElementById("eqLegend"),hs);
+  document.getElementById("eqDesc").textContent=`Cumulative growth, rebased to $1 at ${monDate(dates[0])}.`;
+  attachHover(box,dates,data.map(d=>({key:HUES[d.h].name,color:HUES[d.h].c,vals:d.st.eq,fmt:fmtX})),sy);
+}
+
+function renderDD(){
+  setDims(DIMS_MAIN);
+  const hs=activeHs(), box=document.getElementById("ddChart");
+  const data=hs.map(h=>{ const s=slice(h); return {h,dates:s.dates,st:TS.stats(s.ret)}; });
+  const dates=data[0].dates; if(!dates.length){ box.innerHTML=""; return; }
+  let lo=0; data.forEach(d=>lo=Math.min(lo,...d.st.dd));
+  const sy=scaleY(lo*1.08-0.005,0.004);
+  let svg=gridAndAxis(niceTicks(lo*1.08,0,3),sy,t=>Math.round(t*100)+"%")+xLabels(dates);
+  data.forEach(d=>{ const n=d.dates.length;
+    if(hs.length===1) svg+=`<path d="${linePath(d.st.dd,n,sy)}L${sx(n-1,n)} ${sy(0)}L${sx(0,n)} ${sy(0)}Z" fill="${HUES[d.h].w}"/>`;
+    svg+=`<path d="${linePath(d.st.dd,n,sy)}" fill="none" stroke="${HUES[d.h].c}" stroke-width="2" stroke-linejoin="round"/>`; });
+  svg+=`<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${sy(0)}" y2="${sy(0)}" stroke="var(--baseline)" stroke-width="1"/>`;
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${HL}" role="img" aria-label="Drawdown">${svg}</svg>`;
+  renderLegend(document.getElementById("ddLegend"),hs);
+  attachHover(box,dates,data.map(d=>({key:HUES[d.h].name,color:HUES[d.h].c,vals:d.st.dd,fmt:v=>fmtPctU(v)})),sy);
+}
+
+function renderRoll(){
+  setDims(DIMS_HALF);
+  const hs=activeHs(), box=document.getElementById("rsChart");
+  const data=hs.map(h=>{ const s=slice(h);
+    const v=s.ret.map((_,i)=>{ if(i<35) return null;
+      const w=s.ret.slice(i-35,i+1), m=w.reduce((a,b)=>a+b,0)/36;
+      const sd=Math.sqrt(w.reduce((a,b)=>a+(b-m)*(b-m),0)/35);
+      return sd>0 ? (m*12)/(sd*Math.sqrt(12)) : null; });
+    return {h,dates:s.dates,vals:v}; });
+  const dates=data[0].dates;
+  const all=data.flatMap(d=>d.vals).filter(v=>v!=null);
+  if(!all.length){ box.innerHTML=`<p class="desc">Window shorter than the 36-month rolling period.</p>`; setDims(DIMS_MAIN); return; }
+  const lo=Math.min(0,...all), hi=Math.max(0.2,...all), pad=(hi-lo)*0.1, sy=scaleY(lo-pad,hi+pad);
+  let svg=gridAndAxis(niceTicks(lo-pad,hi+pad,4),sy,t=>t.toFixed(1))+xLabels(dates);
+  svg+=`<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${sy(0)}" y2="${sy(0)}" stroke="var(--baseline)" stroke-width="1"/>`;
+  data.forEach(d=>{ const n=dates.length; let path="", started=false;
+    d.vals.forEach((v,i)=>{ if(v==null) return;
+      path+=(started?"L":"M")+sx(i,n).toFixed(1)+" "+sy(v).toFixed(1); started=true; });
+    svg+=`<path d="${path}" fill="none" stroke="${HUES[d.h].c}" stroke-width="2" stroke-linejoin="round"/>`;
+    for(let i=d.vals.length-1;i>=0;i--) if(d.vals[i]!=null){ svg+=endDot(i,n,d.vals[i],sy,HUES[d.h].c); break; } });
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${HL}" role="img" aria-label="Rolling Sharpe">${svg}</svg>`;
+  renderLegend(document.getElementById("rsLegend"),hs);
+  attachHover(box,dates,data.map(d=>({key:HUES[d.h].name,color:HUES[d.h].c,vals:d.vals,fmt:v=>v.toFixed(2)})),sy);
+  setDims(DIMS_MAIN);
+}
+
+function renderYears(){
+  setDims(DIMS_HALF);
+  const main=state.h==="cmp"?"12":state.h, box=document.getElementById("yrChart");
+  const s=slice(main), byY={};
+  s.dates.forEach((d,i)=>{ const y=d.slice(0,4); (byY[y]=byY[y]||[]).push(s.ret[i]); });
+  const years=Object.keys(byY).sort(), vals=years.map(y=>byY[y].reduce((a,b)=>a*(1+b),1)-1);
+  if(!years.length){ box.innerHTML=""; setDims(DIMS_MAIN); return; }
+  const lo=Math.min(0,...vals), hi=Math.max(0,...vals), pad=(hi-lo)*0.14||0.02, sy=scaleY(lo-pad,hi+pad);
+  let svg=gridAndAxis(niceTicks(lo-pad,hi+pad,4),sy,t=>Math.round(t*100)+"%");
+  const n=years.length, slot=(W-PAD.l-PAD.r)/n, bw=Math.min(24,slot-2);
+  const iMax=vals.indexOf(Math.max(...vals)), iMin=vals.indexOf(Math.min(...vals));
+  const hue=HUES[main].c;
+  years.forEach((y,i)=>{
+    const x=PAD.l+slot*i+(slot-bw)/2, v=vals[i], y0=sy(0), y1=sy(v);
+    const top=Math.min(y0,y1), hgt=Math.max(1.5,Math.abs(y0-y1)), r=Math.min(4,bw/2,hgt);
+    const path = v>=0
+      ? `M${x} ${top+hgt}V${top+r}Q${x} ${top} ${x+r} ${top}H${x+bw-r}Q${x+bw} ${top} ${x+bw} ${top+r}V${top+hgt}Z`
+      : `M${x} ${top}V${top+hgt-r}Q${x} ${top+hgt} ${x+r} ${top+hgt}H${x+bw-r}Q${x+bw} ${top+hgt} ${x+bw} ${top+hgt-r}V${top}Z`;
+    svg+=`<path d="${path}" fill="${hue}"><title>${y}: ${fmtPct(v)}</title></path>`;
+    if(i===iMax||i===iMin) svg+=`<text class="endlab" x="${x+bw/2}" y="${v>=0? y1-5 : y1+13}" text-anchor="middle">${fmtPct(v,0)}</text>`;
+    if(n<=12 || i%2===0) svg+=`<text class="axis" x="${x+bw/2}" y="${HL-7}" text-anchor="middle">${n>14? "'"+y.slice(2):y}</text>`;
+  });
+  svg+=`<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${sy(0)}" y2="${sy(0)}" stroke="var(--baseline)" stroke-width="1"/>`;
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${HL}" role="img" aria-label="Calendar year returns">${svg}</svg>`;
+  document.getElementById("yrDesc").textContent=(state.h==="cmp"?"12m signal":HUES[main].name+" signal")+" · partial first/last years included.";
+  setDims(DIMS_MAIN);
+}
+
+function renderMonthly(){
+  setDims(DIMS_MAIN);
+  const main=state.h==="cmp"?"12":state.h, box=document.getElementById("mrChart");
+  const s=slice(main);
+  if(!s.ret.length){ box.innerHTML=""; return; }
+  const lo=Math.min(...s.ret), hi=Math.max(...s.ret);
+  const pad=Math.max(0.01,(hi-lo)*0.08), sy=scaleY(lo-pad,hi+pad);
+  let svg=gridAndAxis(niceTicks(lo-pad,hi+pad,4),sy,t=>(t*100).toFixed(0)+"%")+xLabels(s.dates);
+  const n=s.ret.length, slot=(W-PAD.l-PAD.r)/n, bw=Math.max(1.4,Math.min(9,slot-1));
+  const y0=sy(0);
+  s.ret.forEach((v,i)=>{
+    const x=PAD.l+slot*i+(slot-bw)/2, y1=sy(v);
+    svg+=`<rect x="${x.toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${bw.toFixed(1)}" `+
+         `height="${Math.max(0.8,Math.abs(y0-y1)).toFixed(1)}" rx="${bw>4?1.5:0.7}" `+
+         `fill="${v>=0?"var(--h12)":"var(--h3)"}"><title>${monDate(s.dates[i])}: ${fmtPct(v)}</title></rect>`;
+  });
+  svg+=`<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${y0}" y2="${y0}" stroke="var(--baseline)" stroke-width="1"/>`;
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${HL}" role="img" aria-label="Monthly returns">${svg}</svg>`;
+  const st=TS.stats(s.ret);
+  document.getElementById("mrDesc").textContent =
+    `${n} months · ${Math.round(st.hit*100)}% positive · best ${fmtPct(st.best)} · worst ${fmtPct(st.worst)}`;
+  document.getElementById("mrLegend").innerHTML =
+    `<span class="k"><span class="dot" style="background:var(--h12)"></span>gain</span>`+
+    `<span class="k"><span class="dot" style="background:var(--h3)"></span>loss</span>`;
+}
+
+function renderBench(){
+  const hs=activeHs(), el=document.getElementById("beTable");
+  const B={}; hs.forEach(h=>{ const s=slice(h); B[h]=TS.benchStats(s.dates,s.ret); });
+  const any=hs.find(h=>B[h]);
+  if(!any){ el.innerHTML=""; document.getElementById("beDesc").textContent=
+    "No benchmark series available."; return; }
+  const rows=[
+    ["Realised beta", h=>B[h]? B[h].beta.toFixed(2):"–"],
+    ["Annualized alpha", h=>B[h]? fmtPct(B[h].alpha):"–"],
+    ["Correlation", h=>B[h]? B[h].corr.toFixed(2):"–"],
+    ["R²", h=>B[h]? (B[h].r2*100).toFixed(0)+"%":"–"],
+    ["S&P return (same window)", h=>B[h]? fmtPct(B[h].benchAnn):"–"],
+    ["S&P vol (same window)", h=>B[h]? fmtPctU(B[h].benchVol):"–"],
+  ];
+  el.innerHTML = `<thead><tr><th>Metric</th>${hs.map(h=>`<th>${HUES[h].name}</th>`).join("")}</tr></thead>`+
+    `<tbody>${rows.map(([lab,f])=>`<tr><td>${lab}</td>${hs.map(h=>`<td>${f(h)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+  const b=B[any];
+  document.getElementById("beDesc").textContent =
+    `OLS on ${b.n} overlapping months against S&P 500 futures excess returns. ` +
+    `A trend book should sit near zero beta; a large |beta| means the strategy is riding equity risk.`;
+}
+
+const CAPS = [1.5,2,3,5,7.5,10,15,25,1e9];
+function renderSweep(){
+  const main=state.h==="cmp"?"12":state.h;
+  const rows=CAPS.map(c=>{
+    const b=bt(main,{vt:state.vt, cap:c, db:state.db});
+    const n=b.ret.length, kk=state.r==="all"?n:Math.min(+state.r,n);
+    const st=TS.stats(b.ret.slice(n-kk));
+    return {c, sharpe:st.sharpe, vol:st.annV, dd:st.maxdd};
+  });
+  const mx=Math.max(...rows.map(r=>Math.abs(r.sharpe)),0.05);
+  const best=rows.reduce((a,b)=>b.sharpe>a.sharpe?b:a);
+  document.getElementById("swDesc").innerHTML =
+    `${HUES[main].name} signal at a ${Math.round(state.vt*100)}% vol target` +
+    (state.db>0?`, ${state.db.toFixed(2)}σ deadband`:"") +
+    ` — best Sharpe at <b style="color:var(--ink)">${best.c>1e8?"uncapped":best.c+"×"}</b> (${best.sharpe.toFixed(2)}).`;
+  document.getElementById("sweep").innerHTML = rows.map(r=>{
+    const cur = Math.abs(r.c-state.cap)<1e-9 || (r.c>1e8 && state.cap>30);
+    const w = Math.abs(r.sharpe)/mx*50;
+    const neg = r.sharpe<0;
+    return `<div class="sweep">
+      <span class="cap${cur?" cur":""}">${r.c>1e8?"none":r.c+"×"}${cur?" ◂":""}</span>
+      <div class="sbar"><span class="z" style="left:50%"></span>
+        <span class="f" style="${neg?`right:50%`:`left:50%`};width:${Math.max(0.6,w)}%;background:${r===best?"var(--accent)":"var(--baseline)"}"></span></div>
+      <span class="m">SR <b>${r.sharpe.toFixed(2)}</b> · vol ${fmtPctU(r.vol,0)} · dd ${fmtPctU(r.dd,0)}</span></div>`;
+  }).join("");
+}
+
+function renderSleeves(){
+  const main=state.h==="cmp"?"12":state.h, el=document.getElementById("slCharts");
+  const w=300,h=120,p={l:8,r:8,t:10,b:8};
+  el.innerHTML = TS.ACS.map(name=>{
+    const b=bt(main,P(),name);
+    const n0=b.ret.length, kk=state.r==="all"?n0:Math.min(+state.r,n0);
+    const rr=b.ret.slice(n0-kk);
+    if(!rr.length) return `<div><span style="font-size:12.5px;font-weight:600">${name}</span></div>`;
+    let eq=1; const eqs=rr.map(v=>eq*=(1+v));
+    const lo=Math.min(1,...eqs), hi=Math.max(1,...eqs);
+    const syv=v=>p.t+(h-p.t-p.b)*(1-(v-lo)/(hi-lo||1));
+    const n=eqs.length, xp=i=>p.l+(w-p.l-p.r)*(n<=1?0:i/(n-1));
+    const path=eqs.map((v,i)=>(i?"L":"M")+xp(i).toFixed(1)+" "+syv(v).toFixed(1)).join("");
+    const st=TS.stats(rr);
+    return `<div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:12.5px;font-weight:600">${name}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink2)">${fmtPct(eqs[n-1]-1,0)} · SR ${st.sharpe.toFixed(2)}</span></div>
+      <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${name} sleeve">
+        <line x1="${p.l}" x2="${w-p.r}" y1="${syv(1)}" y2="${syv(1)}" stroke="var(--grid)" stroke-width="1"/>
+        <path d="${path}L${xp(n-1)} ${syv(lo)}L${xp(0)} ${syv(lo)}Z" fill="${HUES[main].w}"/>
+        <path d="${path}" fill="none" stroke="${HUES[main].c}" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="${xp(n-1)}" cy="${syv(eqs[n-1])}" r="3.5" fill="${HUES[main].c}" stroke="var(--surface)" stroke-width="2"/>
+      </svg></div>`;
+  }).join("");
+  document.getElementById("slDesc").textContent =
+    `Each asset class run as its own TSMOM book on the same parameters, ${state.h==="cmp"?"12m":HUES[main].name} signal.`;
+}
+
+function renderRatios(){
+  const main=state.h==="cmp"?"12":state.h;
+  const hs=activeHs();
+  const S={}; hs.forEach(h=>S[h]=TS.stats(slice(h).ret));
+  const base=TS.stats(slice(main, PAPER_P).ret);
+  const R=[
+    ["Cumulative return", h=>fmtPct(S[h].total,0), base.total, S[main].total, "pp"],
+    ["CAGR", h=>fmtPct(S[h].cagr), base.cagr, S[main].cagr, "pp"],
+    ["Annualized vol", h=>fmtPctU(S[h].annV), base.annV, S[main].annV, "pp"],
+    ["Downside deviation", h=>fmtPctU(S[h].downside), base.downside, S[main].downside, "pp"],
+    ["Sharpe", h=>S[h].sharpe.toFixed(2), base.sharpe, S[main].sharpe, "abs"],
+    ["Sortino", h=>S[h].sortino.toFixed(2), base.sortino, S[main].sortino, "abs"],
+    ["Calmar", h=>S[h].calmar.toFixed(2), base.calmar, S[main].calmar, "abs"],
+    ["Max drawdown", h=>fmtPctU(S[h].maxdd), base.maxdd, S[main].maxdd, "pp"],
+    ["Longest drawdown", h=>S[h].ddMonths+" mo", null, null, ""],
+    ["Days underwater", h=>Math.round(S[h].ddMonths*30.44).toLocaleString(), null, null, ""],
+    ["Hit rate", h=>fmtPctU(S[h].hit,0), base.hit, S[main].hit, "pp"],
+    ["Best month", h=>fmtPct(S[h].best), null, null, ""],
+    ["Worst month", h=>fmtPct(S[h].worst), null, null, ""],
+    ["Avg win / loss", h=>fmtPct(S[h].avgWin)+" / "+fmtPct(S[h].avgLoss), null, null, ""],
+    ["Skew", h=>S[h].skew.toFixed(2), null, null, ""],
+    ["Excess kurtosis", h=>S[h].kurt.toFixed(2), null, null, ""],
+    ["Months", h=>String(S[h].n), null, null, ""],
+  ];
+  const showDelta = !isPaper();
+  const head = `<thead><tr><th>Metric</th>${hs.map(h=>`<th>${HUES[h].name}</th>`).join("")}` +
+    (showDelta?`<th>vs paper</th>`:"") + `</tr></thead>`;
+  const body = R.map(([lab,f,b,v,kind])=>{
+    let d="";
+    if(showDelta && b!=null){
+      const diff = kind==="pp" ? (v-b)*100 : (v-b);
+      const good = (lab==="Max drawdown"||lab==="Annualized vol"||lab==="Downside deviation") ? diff<0 : diff>0;
+      d = Math.abs(diff)<(kind==="pp"?0.05:0.005) ? `<td style="color:var(--muted)">=</td>`
+        : `<td class="delta ${good?"up":"dn"}">${diff>0?"+":""}${diff.toFixed(2)}${kind==="pp"?"pp":""}</td>`;
+    } else if(showDelta) d = `<td style="color:var(--muted)">—</td>`;
+    return `<tr><td>${lab}</td>${hs.map(h=>`<td>${f(h)}</td>`).join("")}${d}</tr>`;
+  }).join("");
+  document.getElementById("ratTable").innerHTML = head+`<tbody>${body}</tbody>`;
+  const sl=slice(main);
+  document.getElementById("ratDesc").textContent = sl.dates.length
+    ? `${monDate(sl.dates[0])} → ${monDate(sl.dates[sl.dates.length-1])}` +
+      (showDelta?" · deltas vs MOP Eq. 5 (uncapped)":" · MOP Eq. 5 baseline") : "";
+}
+
+function renderPositioning(){
+  const main=state.h==="cmp"?"12":state.h, k=+main, p=P();
+  const sl=slice(main);
+  const first = TS.D.dates.indexOf(sl.dates[0]), last = TS.D.dates.indexOf(sl.dates[sl.dates.length-1]);
+  if(first<0){ document.getElementById("posBody").innerHTML=""; return; }
+  const acc={}, TSACS=TS.ACS; TSACS.forEach(a=>acc[a]={net:0,gross:0,long:0,short:0});
+  let net=0, gross=0, n=0, months=0;
+  for(let t=first;t<=last;t++){
+    const b=TS.book(t,k,p); if(!b.rows.length) continue;
+    months++; n+=b.n;
+    b.rows.forEach(r=>{ const ac=TS.D.inst[r.i].ac;
+      acc[ac].net+=r.w; acc[ac].gross+=Math.abs(r.w);
+      if(r.w>0) acc[ac].long++; else if(r.w<0) acc[ac].short++;
+      net+=r.w; gross+=Math.abs(r.w); });
+  }
+  if(!months){ document.getElementById("posBody").innerHTML=""; return; }
+  const mx=Math.max(0.05,...TSACS.map(a=>Math.abs(acc[a].net/months)));
+  document.getElementById("posDesc").textContent =
+    `${months} months of positions · avg net ${((net/months)>=0?"+":"")+(net/months).toFixed(2)}× · ` +
+    `avg gross ${(gross/months).toFixed(2)}× · ${Math.round(n/months)} live markets`;
+  const COL={Equity:"var(--h12)",Bond:"var(--h6)",Commodity:"var(--h3)",FX:"#4a3aa7",Crypto:"#e87ba4"};
+  document.getElementById("posBody").innerHTML = TSACS.map(a=>{
+    const nv=acc[a].net/months, w=Math.max(0.8,Math.abs(nv)/mx/2*100), neg=nv<0;
+    return `<div class="sweep" style="grid-template-columns:92px 1fr 108px">
+      <span class="cap">${a}</span>
+      <div class="sbar" style="background:transparent"><span class="z" style="left:50%"></span>
+        <span class="f" style="${neg?"right:50%":"left:50%"};width:${w}%;background:${COL[a]}"></span></div>
+      <span class="m">${(nv>=0?"+":"")+nv.toFixed(2)}× · ~${Math.round(acc[a].long/months)}L/${Math.round(acc[a].short/months)}S</span></div>`;
+  }).join("");
+}
+
+function renderYearTable(){
+  const cols=["3","6","12"], byHY={};
+  cols.forEach(h=>{ const b=bt(h,P()); byHY[h]={};
+    b.dates.forEach((d,i)=>{ const y=d.slice(0,4); (byHY[h][y]=byHY[h][y]||[]).push(b.ret[i]); }); });
+  const years=[...new Set(cols.flatMap(h=>Object.keys(byHY[h])))].sort().reverse();
+  const cell=(h,y)=>{ const a=byHY[h][y]; return a? fmtPct(a.reduce((p,r)=>p*(1+r),1)-1) : "–"; };
+  document.getElementById("yrTable").innerHTML =
+    `<table><thead><tr><th>Year</th><th>3m</th><th>6m</th><th>12m</th></tr></thead><tbody>`+
+    years.map(y=>`<tr><td>${y}</td>${cols.map(h=>`<td>${cell(h,y)}</td>`).join("")}</tr>`).join("")+
+    `</tbody></table>`;
+}
+
+function renderControls(){
+  document.getElementById("vtV").textContent = Math.round(state.vt*100)+"%";
+  document.getElementById("capV").textContent = state.cap>30 ? "none" : state.cap.toFixed(1)+"×";
+  document.getElementById("dbV").textContent = state.db>0 ? "±"+state.db.toFixed(2)+"σ" : "off";
+  const main=state.h==="cmp"?"12":state.h;
+  const bk=TS.book(TS.lastT(), +main, P());
+  const nCap=bk.rows.filter(r=>r.capped).length;
+  document.getElementById("capBind").textContent =
+    `Binds on ${nCap} of ${bk.n} markets right now.`;
+  document.getElementById("modNote").textContent =
+    isPaper() ? "MOP Eq. 5 exactly — uncapped" :
+    isEng()   ? "engine default — 5× cap (a departure from the paper)" : "custom parameters";
+}
+
+function render(){
+  renderControls(); renderTiles(); renderRatios(); renderPositioning();
+  renderEquity(); renderDD(); renderRoll(); renderYears(); renderMonthly();
+  renderBench(); renderSweep(); renderSleeves(); renderYearTable();
+  const s=slice(state.h==="cmp"?"12":state.h);
+  document.getElementById("subSpan").textContent = s.dates.length
+    ? monDate(s.dates[0])+" → "+monDate(s.dates[s.dates.length-1])+" · "+TS.N+" markets · as of "+DATA.asof
+    : "";
+}
+
+document.getElementById("segH").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return; state.h=b.dataset.h;
+  [...document.querySelectorAll("#segH button")].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  render();
+});
+document.getElementById("segR").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return; state.r=b.dataset.r;
+  [...document.querySelectorAll("#segR button")].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  render();
+});
+const vtR=document.getElementById("vtR"), capR=document.getElementById("capR"), dbR=document.getElementById("dbR");
+vtR.addEventListener("input",e=>{ state.vt=+e.target.value/100; render(); });
+capR.addEventListener("input",e=>{ const v=+e.target.value; state.cap = v>30 ? 1e9 : v; render(); });
+dbR.addEventListener("input",e=>{ state.db=+e.target.value/100; render(); });
+function applyPreset(vt,cap,db){
+  state.vt=vt; state.cap=cap; state.db=db;
+  vtR.value=Math.round(vt*100); capR.value=cap>30?31:cap; dbR.value=db*100; render(); }
+document.getElementById("resetPaper").addEventListener("click",()=>
+  applyPreset(PAPER.vol_target, PAPER.cap==null?1e9:PAPER.cap, 0));
+document.getElementById("resetEng").addEventListener("click",()=>
+  applyPreset(DEF.vol_target, DEF.cap, 0));
+try{ const s=JSON.parse(localStorage.getItem("tsmom_bt")||"null");
+  if(s){ if(s.vt) {state.vt=s.vt; vtR.value=Math.round(s.vt*100);}
+         if(s.cap){state.cap=s.cap; capR.value=s.cap>30?31:s.cap;}
+         if(s.db){state.db=s.db; dbR.value=s.db*100;} } }catch{}
+["input","click"].forEach(ev=>document.addEventListener(ev,()=>{
+  try{ localStorage.setItem("tsmom_bt", JSON.stringify({vt:state.vt,cap:state.cap,db:state.db})); }catch{} }));
+render();
+</script>

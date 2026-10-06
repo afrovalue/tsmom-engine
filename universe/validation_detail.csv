@@ -1,0 +1,84 @@
+name,asset_class,ticker,source_type,n_obs,verdict,reason,years,last,adv_usd,adv_basis,thin
+WTI Crude,Commodity,CL=F,futures,5459,PASS,,21.7,104.22,1000000000.0,tier: deep,False
+Brent Crude,Commodity,BZ=F,futures,4762,PASS,,19.1,107.72,1000000000.0,tier: deep,False
+RBOB Gasoline,Commodity,RB=F,futures,5462,PASS,,21.7,3.2242,1000000000.0,tier: deep,False
+Heating Oil,Commodity,HO=F,futures,5459,PASS,,21.7,5.0094,1000000000.0,tier: deep,False
+Natural Gas,Commodity,UNG,etf,4884,PASS,,19.4,10.54,93035526.0,measured,False
+Gold,Commodity,GC=F,futures,5456,PASS,,21.7,4376.7998,1000000000.0,tier: deep,False
+Silver,Commodity,SI=F,futures,5456,PASS,,21.7,65.09,1000000000.0,tier: deep,False
+Copper,Commodity,HG=F,futures,5459,PASS,,21.7,6.4915,1000000000.0,tier: deep,False
+Platinum,Commodity,PL=F,futures,4898,PASS,,21.7,1785.2,100000000.0,tier: moderate,False
+Palladium,Commodity,PA=F,futures,5013,PASS,,21.7,1323.0,100000000.0,tier: moderate,False
+Corn,Commodity,ZC=F,futures,5459,PASS,,21.7,538.0,1000000000.0,tier: deep,False
+Wheat CBOT,Commodity,ZW=F,futures,5461,PASS,,21.7,732.25,1000000000.0,tier: deep,False
+Wheat KC,Commodity,KE=F,futures,5461,PASS,,21.7,800.25,100000000.0,tier: moderate,False
+Soybeans,Commodity,ZS=F,futures,5461,PASS,,21.7,1327.25,1000000000.0,tier: deep,False
+Soybean Meal,Commodity,ZM=F,futures,5461,PASS,,21.7,367.2,1000000000.0,tier: deep,False
+Soybean Oil,Commodity,ZL=F,futures,5461,PASS,,21.7,70.55,1000000000.0,tier: deep,False
+Oats,Commodity,ZO=F,futures,5461,PASS,,21.7,395.0,20000000.0,tier: thin,False
+Rough Rice,Commodity,ZR=F,futures,5448,PASS,,21.7,15.785,20000000.0,tier: thin,False
+Coffee,Commodity,KC=F,futures,5454,PASS,,21.7,299.65,1000000000.0,tier: deep,False
+Cotton,Commodity,CT=F,futures,5456,PASS,,21.7,84.92,1000000000.0,tier: deep,False
+Sugar,Commodity,SB=F,futures,5456,PASS,,21.7,18.66,1000000000.0,tier: deep,False
+Cocoa,Commodity,CC=F,futures,5454,PASS,,21.7,5895.0,100000000.0,tier: moderate,False
+Orange Juice,Commodity,OJ=F,futures,5455,PASS,,21.7,152.15,20000000.0,tier: thin,False
+Live Cattle,Commodity,LE=F,futures,5434,PASS,,21.7,220.7,1000000000.0,tier: deep,False
+Feeder Cattle,Commodity,GF=F,futures,5445,PASS,,21.7,340.275,100000000.0,tier: moderate,False
+Lean Hogs,Commodity,HE=F,futures,5456,PASS,,21.7,79.075,100000000.0,tier: moderate,False
+Carbon Allowances,Commodity,KRBN,etf,1538,FAIL,ADV $0.4M < $6.0M needed,6.1,34.1,422840.0,measured,False
+Uranium,Commodity,URA,etf,3987,PASS,,15.9,41.77,120224504.0,measured,False
+S&P 500,Equity,ES=F,futures,5468,PASS,,21.7,7669.5,1000000000.0,tier: deep,False
+Nasdaq 100,Equity,NQ=F,futures,5468,PASS,,21.7,29357.0,1000000000.0,tier: deep,False
+Dow,Equity,YM=F,futures,5461,PASS,,21.7,52579.0,1000000000.0,tier: deep,False
+Russell 2000,Equity,RTY=F,futures,2313,PASS,,9.2,2897.7,1000000000.0,tier: deep,False
+Nikkei 225,Equity,NKD=F,futures,5458,PASS,,21.7,63980.0,100000000.0,tier: moderate,False
+Euro Stoxx 50,Equity,FEZ,etf,5459,PASS,,21.7,68.62,49327489.0,measured,False
+Australia,Equity,EWA,etf,5459,PASS,,21.7,28.89,58603364.0,measured,False
+Canada,Equity,EWC,etf,5459,PASS,,21.7,60.29,81059906.0,measured,False
+Hong Kong,Equity,EWH,etf,5459,PASS,,21.7,22.47,56040178.0,measured,False
+Singapore,Equity,EWS,etf,5459,PASS,,21.7,33.13,28549778.0,measured,False
+Korea,Equity,EWY,etf,5459,PASS,,21.7,176.49,3237206154.0,measured,False
+Taiwan,Equity,EWT,etf,5459,PASS,,21.7,106.67,495738149.0,measured,False
+India,Equity,INDA,etf,3674,PASS,,14.6,47.59,235725168.0,measured,False
+China A-Shares,Equity,ASHR,etf,3232,PASS,,12.9,33.24,121706604.0,measured,False
+China Large Cap,Equity,FXI,etf,5459,PASS,,21.7,34.4,681808030.0,measured,False
+Brazil,Equity,EWZ,etf,5459,PASS,,21.7,37.78,733315443.0,measured,False
+Mexico,Equity,EWW,etf,5459,PASS,,21.7,74.03,75647554.0,measured,False
+South Africa,Equity,EZA,etf,5459,PASS,,21.7,68.92,8466822.0,measured,True
+Emerging Broad,Equity,EEM,etf,5459,PASS,,21.7,65.76,1364700884.0,measured,False
+UK,Equity,EWU,etf,5459,PASS,,21.7,47.8,37269659.0,measured,False
+Switzerland,Equity,EWL,etf,5459,PASS,,21.7,60.25,18990800.0,measured,False
+Sweden,Equity,EWD,etf,5459,PASS,OVERRIDE keep (was: ADV $4.5M < $6.0M needed),21.7,51.25,4499750.0,measured,True
+US 2Y Note,Bond,ZT=F,futures,5461,PASS,,21.7,102.0391,1000000000.0,tier: deep,False
+US 5Y Note,Bond,ZF=F,futures,5461,PASS,,21.7,104.3594,1000000000.0,tier: deep,False
+US 10Y Note,Bond,ZN=F,futures,5449,PASS,,21.7,105.9219,1000000000.0,tier: deep,False
+US 30Y Bond,Bond,ZB=F,futures,5455,PASS,,21.7,106.5312,1000000000.0,tier: deep,False
+Intl Treasuries,Bond,IGOV,etf,4433,FAIL,ADV $5.3M < $6.0M needed,17.6,40.61,5297575.0,measured,False
+Intl Treasuries Broad,Bond,BWX,etf,4761,PASS,,18.9,21.56,8345876.0,measured,True
+US TIPS,Bond,TIP,etf,5459,PASS,,21.7,105.79,178827418.0,measured,False
+EM Sovereign USD,Bond,EMB,etf,4713,PASS,,18.7,92.99,521181041.0,measured,False
+EM Local Currency,Bond,EMLC,etf,4061,PASS,,16.1,25.19,41558463.0,measured,False
+US HY Credit,Bond,HYG,etf,4889,PASS,,19.4,78.38,2320451576.0,measured,False
+US IG Credit,Bond,LQD,etf,5459,PASS,,21.7,104.28,2915371568.0,measured,False
+EUR/USD,FX,6E=F,futures,5468,PASS,,21.7,1.1589,1000000000.0,tier: deep,False
+JPY/USD,FX,6J=F,futures,5469,PASS,,21.7,0.0065,1000000000.0,tier: deep,False
+GBP/USD,FX,6B=F,futures,5468,PASS,,21.7,1.3477,1000000000.0,tier: deep,False
+AUD/USD,FX,6A=F,futures,5469,PASS,,21.7,0.7119,1000000000.0,tier: deep,False
+CAD/USD,FX,6C=F,futures,5468,PASS,,21.7,0.7207,1000000000.0,tier: deep,False
+CHF/USD,FX,6S=F,futures,5469,PASS,,21.7,1.2343,100000000.0,tier: moderate,False
+NZD/USD,FX,6N=F,futures,5470,PASS,,21.7,0.577,100000000.0,tier: moderate,False
+Dollar Index,FX,UUP,etf,4917,PASS,,19.5,28.22,46119945.0,measured,False
+USD/MXN,FX,USDMXN=X,fx_spot,5651,PASS,,21.7,17.133,,—,False
+USD/BRL,FX,USDBRL=X,fx_spot,5302,PASS,,20.5,5.1524,,—,False
+USD/ZAR,FX,USDZAR=X,fx_spot,5644,PASS,,21.7,16.266,,—,False
+USD/TRY,FX,USDTRY=X,fx_spot,5643,PASS,,21.7,48.652,,—,False
+USD/INR,FX,USDINR=X,fx_spot,5628,PASS,,21.7,95.95,,—,False
+USD/KRW,FX,USDKRW=X,fx_spot,5628,PASS,,21.7,1367.85,,—,False
+USD/TWD,FX,USDTWD=X,fx_spot,5273,PASS,,20.3,31.766,,—,False
+USD/PLN,FX,USDPLN=X,fx_spot,5628,PASS,,21.7,3.7547,,—,False
+USD/CNY,FX,USDCNY=X,fx_spot,5648,PASS,,21.7,6.7055,,—,False
+USD/SGD,FX,USDSGD=X,fx_spot,5643,PASS,,21.7,1.2703,,—,False
+USD/ILS,FX,USDILS=X,fx_spot,5628,PASS,,21.7,3.0272,,—,False
+USD/CLP,FX,USDCLP=X,fx_spot,5629,PASS,,21.7,955.37,,—,False
+Bitcoin,Crypto,BTC=F,futures,2200,PASS,,8.7,75550.0,1000000000.0,tier: deep,False
+Ethereum,Crypto,ETH=F,futures,1412,PASS,,5.6,2390.0,100000000.0,tier: moderate,False
